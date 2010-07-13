@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<object type="TAForm" name="firstStartGUI">
+	<properties>
+		<property name="Left" vt="Int16">1214</property>
+		<property name="Top" vt="Int16">459</property>
+		<property name="Width" vt="Int16">549</property>
+		<property name="Height" vt="Int16">486</property>
+		<property name="Caption" vt="String">FP-QUIFirstStartAssistant</property>
+		<property name="Color" vt="Ident">clBtnFace</property>
+		<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
+		<property name="Font.Color" vt="Ident">clWindowText</property>
+		<property name="Font.Height" vt="Int8">-13</property>
+		<property name="Font.Name" vt="String">MS Sans Serif</property>
+		<property name="Font.Style" vt="Set"/>
+		<property name="OldCreateOrder" vt="False">False</property>
+		<property name="Position" vt="Ident">poDesktopCenter</property>
+		<property name="Style" vt="Int32">-1798438912</property>
+		<property name="ExStyle" vt="Int16">256</property>
+		<property name="Version" vt="String">1.03</property>
+		<property name="FormOptPopulate" vt="True">True</property>
+		<property name="FormOptIndentCount" vt="Int8">0</property>
+		<property name="FormOptVarScope" vt="Int8">1</property>
+		<property name="PixelsPerInch" vt="Int8">120</property>
+		<property name="TextHeight" vt="Int8">16</property>
+	</properties>
+	<components>
+		<object type="TACheckbox" name="autoStartCheckbox">
+			<properties>
+				<property name="Left" vt="Int8">8</property>
+				<property name="Top" vt="Int8">88</property>
+				<property name="Width" vt="Int16">513</property>
+				<property name="Height" vt="Int8">17</property>
+				<property name="Caption" vt="String">AutoStart Entry</property>
+				<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
+				<property name="Font.Color" vt="Ident">clWindowText</property>
+				<property name="Font.Height" vt="Int8">-13</property>
+				<property name="Font.Name" vt="String">MS Sans Serif</property>
+				<property name="Font.Style" vt="Set">fsBold</property>
+				<property name="ParentFont" vt="False">False</property>
+				<property name="TabOrder" vt="Int8">0</property>
+				<property name="CtrlStyle" vt="Int32">1342242819</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockRight, DockTop, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TACheckbox" name="registerCheckbox">
+			<properties>
+				<property name="Left" vt="Int8">8</property>
+				<property name="Top" vt="Int16">176</property>
+				<property name="Width" vt="Int16">513</property>
+				<property name="Height" vt="Int8">17</property>
+				<property name="Caption" vt="String">Registry entry</property>
+				<property name="Checked" vt="True">True</property>
+				<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
+				<property name="Font.Color" vt="Ident">clWindowText</property>
+				<property name="Font.Height" vt="Int8">-13</property>
+				<property name="Font.Name" vt="String">MS Sans Serif</property>
+				<property name="Font.Style" vt="Set">fsBold</property>
+				<property name="ParentFont" vt="False">False</property>
+				<property name="State" vt="Ident">cbChecked</property>
+				<property name="TabOrder" vt="Int8">1</property>
+				<property name="CtrlStyle" vt="Int32">1342242819</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockRight, DockTop, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAEdit" name="registerEdit">
+			<properties>
+				<property name="Left" vt="Int8">27</property>
+				<property name="Top" vt="Int16">200</property>
+				<property name="Width" vt="Int16">497</property>
+				<property name="Height" vt="Int16">185</property>
+				<property name="Lines.Strings" vt="List">
+					<list>
+						<li vt="String">This creates an entry in the registry that points to the location of FP-QUI. This allows applications that are designed for FP-QUI to start it on-demand. In other words, if </li>
+						<li vt="String">FP-QUICore is not running and an application wants to create a QUI, it might try to </li>
+						<li vt="String">start FP-QUICore.exe, but fails if it cannot find it.</li>
+						<li vt="String"/>
+						<li vt="String">You may at any time deregister FP-QUI (remove the registry entry) using the </li>
+						<li vt="String">ConfigurationAssistant.</li>
+						<li vt="String">You may also set an &quot;Auto Register&quot; option, that specifies whether FP-QUICore </li>
+						<li vt="String">registers its location every time it's launched.</li>
+						<li vt="String">In addition, you can specify FP-QUICore to deregister itself when it is terminated by </li>
+						<li vt="String">enabling the &quot;Auto Deregister&quot; option.</li>
+					</list>
+				</property>
+				<property name="TabOrder" vt="Int8">2</property>
+				<property name="CtrlStyle" vt="Int32">1342248964</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockRight, DockTop</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAEdit" name="autoStartEdit">
+			<properties>
+				<property name="Left" vt="Int8">27</property>
+				<property name="Top" vt="Int8">112</property>
+				<property name="Width" vt="Int16">497</property>
+				<property name="Height" vt="Int8">49</property>
+				<property name="Lines.Strings" vt="List">
+					<list>
+						<li vt="String">FP-QUICore will be started automatically when you login if this is enabled. This </li>
+						<li vt="String">enhances reliability, but consumes memory and some CPU cycles. You may leave </li>
+						<li vt="String">this uncheckd, it is optional.</li>
+					</list>
+				</property>
+				<property name="TabOrder" vt="Int8">3</property>
+				<property name="CtrlStyle" vt="Int32">1342248964</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockRight, DockTop</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAButton" name="cancelButton">
+			<properties>
+				<property name="Left" vt="Int16">192</property>
+				<property name="Top" vt="Int16">400</property>
+				<property name="Width" vt="Int16">163</property>
+				<property name="Height" vt="Int8">33</property>
+				<property name="Caption" vt="String">Cancel</property>
+				<property name="TabOrder" vt="Int8">4</property>
+				<property name="Color" vt="Ident">clBtnFace</property>
+				<property name="CtrlStyle" vt="Int32">1342259200</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockRight, DockBottom, DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAButton" name="saveButton">
+			<properties>
+				<property name="Left" vt="Int16">360</property>
+				<property name="Top" vt="Int16">400</property>
+				<property name="Width" vt="Int16">163</property>
+				<property name="Height" vt="Int8">33</property>
+				<property name="Caption" vt="String">Save</property>
+				<property name="TabOrder" vt="Int8">5</property>
+				<property name="Color" vt="Ident">clBtnFace</property>
+				<property name="CtrlStyle" vt="Int32">1342259200</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockRight, DockBottom, DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAButton" name="helpButton">
+			<properties>
+				<property name="Left" vt="Int8">8</property>
+				<property name="Top" vt="Int16">400</property>
+				<property name="Width" vt="Int16">163</property>
+				<property name="Height" vt="Int8">33</property>
+				<property name="Caption" vt="String">Help</property>
+				<property name="TabOrder" vt="Int8">6</property>
+				<property name="Color" vt="Ident">clBtnFace</property>
+				<property name="CtrlStyle" vt="Int32">1342259201</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockBottom, DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAEdit" name="Edit3">
+			<properties>
+				<property name="Left" vt="Int8">8</property>
+				<property name="Top" vt="Int8">8</property>
+				<property name="Width" vt="Int16">441</property>
+				<property name="Height" vt="Int8">65</property>
+				<property name="Lines.Strings" vt="List">
+					<list>
+						<li vt="String">This seems to be the first time you have launched FP-QUI or FP-QUICore </li>
+						<li vt="String">with a new configuration (you can have one configuration per user or </li>
+						<li vt="String">machine or use other criteria). This assistant helps you with essential </li>
+						<li vt="String">settings that might affect how FP-QUI works for you.</li>
+					</list>
+				</property>
+				<property name="TabOrder" vt="Int8">7</property>
+				<property name="CtrlStyle" vt="Int32">1342248964</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockLeft, DockTop</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TAIcon" name="Icon1">
+			<properties>
+				<property name="Left" vt="Int16">464</property>
+				<property name="Top" vt="Int8">16</property>
+				<property name="Width" vt="Int8">48</property>
+				<property name="Height" vt="Int8">48</property>
+				<property name="CtrlStyle" vt="Int32">1342310659</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="PicturePath" vt="String">E:\sabox\grid\FP-QUI\icon.ico</property>
+				<property name="Resizing" vt="Set">DockRight, DockTop, DockWidth, DockHeight</property>
+				<property name="TabOrder" vt="Int8">8</property>
+			</properties>
+			<components/>
+		</object>
+	</components>
+</object>

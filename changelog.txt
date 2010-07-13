@@ -1,0 +1,106 @@
+======
+20100711T1623675
+
+ - removed FP-QUISignal
+
+
+======
+20100711T0304179
+
+ - NEW: FP-QuinterfaceCodeGenerator (beta): a GUI to create FP-Quinterface-Code that can be used in scripts and other programs
+
+
+======
+20100708T041106
+
+- updated documentation
+
+
+======
+20100705T0321765
+
+ - multiple buttons are displayed side by side, the width is determined automatically
+ - new option: minimumFontSize ... specifies the minimum font size that is used when no font size is specified and auto-font-downsizing is applied (to make the notification fit into the dispatcher-area)
+
+
+======
+20100624T0559607
+
+- changed name to FP-QInterface
+
+
+======
+20100624T0402338
+
+- maximum number of instances can now be set (default is ten) in config
+
+
+======
+20100530T1749782
+
+ - notifications fade out per default
+ - added config option "fadeOut" (dis/enables fadeOut)
+ - default trans changed to 200
+
+
+======
+20100530T0359999
+
+ - new CL option: <createIfNotVisible> 
+... <>"": If you update a notification declaring a winhandle and it's not visible this will automatically fall back to creating a new one. This will not work with update, since only part of the signature of the notification is provided (doesn't make sense).
+=="" (default): no auto create
+ - slightly improved performance
+
+
+======
+20100525T1408809
+
+ - named pipes do no longer use string reverse (which was thought to increase security, but, in fact, is useless and just causes interop problems)
+ - named pipes include was changed: a new method allows one to create a new pipe manually
+
+
+======
+20100509T2044
+
+FP-NotifierBeeper will no longer crash on invalid arguments
+
+
+======
+20100509T20
+
+if arguments in <talk>, <beep>, <audio> or <run> are invalid or will cause heavy resource consumption (eg: pause below 1000ms), defaults shall be applied
+
+
+======
+20100509T03
+
+minor bug-fixes
+
+
+======
+20100430T23
+
+new talk sub-option: you may now add repeat and pause similar to <audio> and <beep> 
+(the sub-options are: <string> (use %text% to talk what's specified in <text>), <pause>, <repeat>)
+
+revised error handling
+minor bug fixes
+
+
+======
+1.6
+
+ - stability improvements
+	improved singleton handling
+	fixed "used without array-variable" bug
+	
+ - usability improvements
+	behaviour when executing FP-Notifier and FP-NotifierCore is now equivalent, FP-Notifier.exe detects whether FP-NotifierCore.exe is running or not and starts it if necessary
+
+	
+======
+1.5
+
+
+ - increased performance
+	fixed resource-hungry variable replacement upon request
