@@ -17,7 +17,7 @@ Func _initialize($version,$suffix)
 			
 		If @error Then Exit
 			
-		Global $basePath = @ScriptDir&"\dist\FP-QUI_v"&$version&"_"&$suffix
+		Global $basePath = @ScriptDir&"\dist\FP-QUI_v"&$version&$suffix
 		
 		If DirGetSize($basePath,2) <> -1 Then 
 			MsgBox(0,@ScriptName,"Version already exists, try again.")
@@ -48,7 +48,7 @@ Func _setDefaultConfig($path)
 	IniWrite($path,"_ini","iniSyncInteractive",0)
 
 	IniWrite($path,"defaults","font","Segoe UI")
-	IniWrite($path,"defaults","fontSize",16)
+	IniWrite($path,"defaults","fontSize",18)
 	
 	IniWrite($path,"behaviour","promptIfNoArguments",0)
 	IniWrite($path,"behaviour","fadeOut",1)

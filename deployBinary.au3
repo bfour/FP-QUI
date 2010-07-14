@@ -16,7 +16,7 @@ FileDelete($basePath&"\deploy*.exe")
 FileCopy($appPath&"\*.ico",$basePath&"\",8)
 
 ;gui
-FileCopy($appPath&"\gui",$basePath&"\GUI\",8)
+;~ FileCopy($appPath&"\gui",$basePath&"\GUI\",8)
 
 ;config
 FileCopy($appPath&"\data\config_global.ini",$basePath&"\data\config_global.ini",8)

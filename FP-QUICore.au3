@@ -1429,7 +1429,7 @@ EndFunc
 
 Func OnAutoItExit()
 	
-	If $behaviourAutoDeregister == 1 Then _fpquiDeregister(False)
+	If $behaviourAutoDeregister == 1 Then _deregister(0, 1)
 	If @error Then _error("Deregistering FP-QUI failed:"&@LF&"@error="&@error&@LF&"@extended="&@extended&@LF&"$behaviourAutoRegister="&$behaviourAutoRegister, $errorInteractive, $errorInteractive, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
 	
 EndFunc

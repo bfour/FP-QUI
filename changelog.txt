@@ -1,4 +1,16 @@
 ======
+20100714T203992
+
+- fixed: FP-QUICore crashes if autoDeregister is set to 1 ("unknown function name")
+
+
+======
+20100714T2011397
+
+ - fixed: FP-QUIFirstStart assistant does not set firstStart entry in ini
+
+
+======
 20100711T1623675
 
  - removed FP-QUISignal

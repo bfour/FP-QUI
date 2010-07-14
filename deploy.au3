@@ -54,7 +54,7 @@ Func _deploy()
 	
 	_fpqui("<text>wrapping-up</text><ico>"&@ScriptDir&"\icon.ico</ico><avi>%grid%\FP-QUI\GUI\busy_indicator.avi</avi><untilProcessClose>"&@AutoItPID&"</untilProcessClose><bkColor>purple</bkColor>")
 	_runWait(@ScriptDir&"\deployBinary.exe "&$version)
-	_runWait(@ScriptDir&"\deploySource.exe "&$version)
+;~ 	_runWait(@ScriptDir&"\deploySource.exe "&$version)
 		
 	
 	Beep(500,400)
