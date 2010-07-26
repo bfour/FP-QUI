@@ -34,12 +34,21 @@
 	
 #CE
 
+Global $debug = 1
+Global $debugTimer = TimerInit()
+Func _debug($string)
+;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
+EndFunc
+
+;~ _debug("include/ start")
+
 #NoTrayIcon
 
 #Include <Misc.au3>
 #Include <NamedPipes.au3>
 
 #include <_run.au3>
+Global $CONFIG_INIT = False
 #include <_config.au3>
 
 #include "modules\initializeErrorHandling.au3"
@@ -49,12 +58,14 @@
 #include "modules\setBehaviour.au3"
 #include "modules\argumentsPrompt.au3"
 
+;~ _debug("include/ end")
 
 _initializeErrorHandling()
 _initializeBehaviour()
 
 Global $errorForceMsgBox=1
 
+;~ _debug("init/ end")
 
 ;check if maxInstances is reached
 Local $procList = ProcessList(@ScriptName)
@@ -63,6 +74,7 @@ If $procList[0][0] > $behaviourMaxInstances Then
 	Exit
 EndIf
 
+;~ _debug("check/ end")
 
 Local $request=$CmdLineRaw
 If $request=="" Then
@@ -76,12 +88,7 @@ If $request=="" Then
 	
 EndIf
 
-;~ Local $ar
-;~ while 1
-;~ $ar=_NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI")
-;~ ConsoleWrite($ar)
-;~ sleep(1000)
-;~ WEnd
+;~ _debug("reqProcess/ end")
 
 ;ensure notifier is running
 If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist --> not running
@@ -94,6 +101,10 @@ If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist -
 	
 EndIf
 
+;~ _debug("ensure/ end")
+
 _forwardRequest($request)
+
+;~ _debug("fwd/ end")
 
 Exit(@error)

@@ -1,4 +1,16 @@
 ======
+20100726T1355
+
+- changed: FP-QUI no longer initializes config.ini on start, since this is done by FP-QUICore anyways. This should slightly increase performance.
+
+
+======
+20100726T1341489
+
+- fixed: when FP-Core is not yet running and launched with parameters, it does not process them
+
+
+======
 20100714T203992
 
 - fixed: FP-QUICore crashes if autoDeregister is set to 1 ("unknown function name")

@@ -172,15 +172,11 @@
 
 Opt("GUIOnEventMode",1)
 
-$CmdLineRaw=""
 Global $debug = 1
 Global $debugTimer = TimerInit()
 Func _debug($string)
 ;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
 EndFunc
-
-;~ FileWriteLine(@ScriptDir&"\debug"&@ComputerName&".txt","")
-;~ FileWriteLine(@ScriptDir&"\debug"&@ComputerName&".txt",@YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC)
 
 _start()
 

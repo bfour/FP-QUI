@@ -22,7 +22,7 @@ $Checkbox1 = GUICtrlCreateCheckbox("no changelog entry", 8, 344, 137, 33)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
-GUICtrlSetData($Input1,@YEAR&@MON&@MDAY&"T"&@HOUR&@MIN&@MSEC)
+GUICtrlSetData($Input1,@YEAR&@MON&@MDAY&"T"&@HOUR&@MIN)
 GUICtrlSetData($Edit1,"")
 
 
