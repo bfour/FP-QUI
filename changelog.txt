@@ -1,44 +1,55 @@
 ======
+20100731T1825
+
+ - fixed: FP-CodeGeneratorGUI won't create more than four buttons
+ - new: menu gives quick access to the most relevant tools
+ - fixed: help buttons in FP-QUIConfigurationAssistant and FirstStartAssistant do not open help file
+ - changed: documentation cleanup
+
+======
+20100731T1444
+
+ - updated documentation
+
+======
+20100728T1602
+
+ - new: documentation (help file)
+
+======
 20100726T1355
 
-- changed: FP-QUI no longer initializes config.ini on start, since this is done by FP-QUICore anyways. This should slightly increase performance.
-
+ - changed: FP-QUI no longer initializes config.ini on start, since this is done by FP-QUICore anyways. This should slightly increase performance.
 
 ======
 20100726T1341489
 
-- fixed: when FP-Core is not yet running and launched with parameters, it does not process them
-
+ - fixed: when FP-Core is not yet running and launched with parameters, it does not process them
 
 ======
 20100714T203992
 
-- fixed: FP-QUICore crashes if autoDeregister is set to 1 ("unknown function name")
-
+ - fixed: FP-QUICore crashes if autoDeregister is set to 1 ("unknown function name")
 
 ======
 20100714T2011397
 
  - fixed: FP-QUIFirstStart assistant does not set firstStart entry in ini
 
-
 ======
 20100711T1623675
 
  - removed FP-QUISignal
-
 
 ======
 20100711T0304179
 
  - NEW: FP-QuinterfaceCodeGenerator (beta): a GUI to create FP-Quinterface-Code that can be used in scripts and other programs
 
-
 ======
 20100708T041106
 
-- updated documentation
-
+ - updated documentation
 
 ======
 20100705T0321765
@@ -46,18 +57,15 @@
  - multiple buttons are displayed side by side, the width is determined automatically
  - new option: minimumFontSize ... specifies the minimum font size that is used when no font size is specified and auto-font-downsizing is applied (to make the notification fit into the dispatcher-area)
 
-
 ======
 20100624T0559607
 
-- changed name to FP-QInterface
-
+ - changed name to FP-QInterface
 
 ======
 20100624T0402338
 
-- maximum number of instances can now be set (default is ten) in config
-
+ - maximum number of instances can now be set (default is ten) in config
 
 ======
 20100530T1749782
@@ -65,7 +73,6 @@
  - notifications fade out per default
  - added config option "fadeOut" (dis/enables fadeOut)
  - default trans changed to 200
-
 
 ======
 20100530T0359999
@@ -75,41 +82,34 @@
 =="" (default): no auto create
  - slightly improved performance
 
-
 ======
 20100525T1408809
 
- - named pipes do no longer use string reverse (which was thought to increase security, but, in fact, is useless and just causes interop problems)
+ - named pipes do no longer use string reverse (which was thought to increase security, but, in fact, is useless and causes interop problems)
  - named pipes include was changed: a new method allows one to create a new pipe manually
-
 
 ======
 20100509T2044
 
-FP-NotifierBeeper will no longer crash on invalid arguments
-
+ - FP-NotifierBeeper will no longer crash on invalid arguments
 
 ======
 20100509T20
 
-if arguments in <talk>, <beep>, <audio> or <run> are invalid or will cause heavy resource consumption (eg: pause below 1000ms), defaults shall be applied
-
+ - if arguments in <talk>, <beep>, <audio> or <run> are invalid or will cause heavy resource consumption (eg: pause below 1000ms), defaults shall be applied
 
 ======
 20100509T03
 
-minor bug-fixes
-
+ - minor bug-fixes
 
 ======
 20100430T23
 
-new talk sub-option: you may now add repeat and pause similar to <audio> and <beep> 
+ - new talk sub-option: you may now add repeat and pause similar to <audio> and <beep> 
 (the sub-options are: <string> (use %text% to talk what's specified in <text>), <pause>, <repeat>)
-
-revised error handling
-minor bug fixes
-
+ - revised error handling
+ - minor bug fixes
 
 ======
 1.6
@@ -117,7 +117,6 @@ minor bug fixes
  - stability improvements
 	improved singleton handling
 	fixed "used without array-variable" bug
-	
  - usability improvements
 	behaviour when executing FP-Notifier and FP-NotifierCore is now equivalent, FP-Notifier.exe detects whether FP-NotifierCore.exe is running or not and starts it if necessary
 
@@ -125,6 +124,4 @@ minor bug fixes
 ======
 1.5
 
-
- - increased performance
-	fixed resource-hungry variable replacement upon request
+ - increased performance: fixed resource-hungry variable replacement upon request

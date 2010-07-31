@@ -383,22 +383,13 @@ Func _mainLoop()
 					Local $currentButtons = _XMLGetChildNodes("/xml/button")
 
 					If Not @error Then
-						
-						;go through current IDs and find the lowest one that is not yet in use
-						Local $IDMemory = StringReplace($currentButtons[1], "ID", "")
-						Local $currentID = $IDMemory+1
-						For $i=2 To UBound($currentButtons)-1
-							
-							$currentID = StringReplace($currentButtons[$i], "ID", "")
-							If $currentID-$IDMemory > 1 Or $i == UBound($currentButtons)-1 Then
-								$currentID = $currentID+1
-								ExitLoop
-							EndIf
-								
+						;go through current IDs and find the next one that is not yet in use
+						Local $cache = 0
+						For $i=1 To UBound($currentButtons)-1
+							$cache = StringReplace($currentButtons[$i], "ID", "")
+							If $cache > $ID Then $ID = $cache
 						Next
-						
-						$ID = $currentID
-						
+						$ID += 1
 					EndIf
 				
 				ElseIf Number($ID)>0 Then

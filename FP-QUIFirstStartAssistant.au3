@@ -14,6 +14,7 @@
 #include <_setAutoStart.au3>
 #include <_config.au3>
 
+#include "modules\vars.au3"
 #include "modules\initializeErrorHandling.au3"
 #include "modules\setConfiguration.au3"
 #include "modules\register.au3"
@@ -148,7 +149,9 @@ Func _mainLoop()
 			Exit
 			
 		Case $helpButton
-;TODO implement			
+			ShellExecute($FPQUI_HELPPATH, "", "", "open")
+			If @error Then _error("Could not open help file at "&$FPQUI_HELPPATH, 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+	
 		EndSwitch
 		
 		Sleep(20)

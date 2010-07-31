@@ -28,6 +28,7 @@
 #include <_path.au3>
 #include <_error.au3>
 
+#include "modules\vars.au3"
 #include "modules\initializeErrorHandling.au3"
 #include "modules\initializeBehaviour.au3"
 #include "modules\initializeDefaults.au3"
@@ -69,11 +70,11 @@ Func _initializeGUI()
 	
 	
 	;behaviour
-	If $behaviourPromptIfNoArguments Then
-		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
-	Else
-		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
-	EndIf
+;~ 	If $behaviourPromptIfNoArguments Then
+;~ 		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
+;~ 	Else
+;~ 		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
+;~ 	EndIf
 	
 	If $behaviourAutoRegister Then
 		GUICtrlSetState($autoRegisterCheckbox, $GUI_CHECKED)
@@ -127,11 +128,11 @@ Func _save()
 	
 	
 	;behaviour
-	If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
-		_setConfiguration("behaviour", "promptIfNoArguments", 1)
-	Else
-		_setConfiguration("behaviour", "promptIfNoArguments", 0)
-	EndIf
+;~ 	If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
+;~ 		_setConfiguration("behaviour", "promptIfNoArguments", 1)
+;~ 	Else
+;~ 		_setConfiguration("behaviour", "promptIfNoArguments", 0)
+;~ 	EndIf
 
 	If GUICtrlRead($autoRegisterCheckbox) == 1 Then
 		_setConfiguration("behaviour", "autoRegister", 1)
@@ -188,7 +189,8 @@ Func _mainLoop()
 		Exit
 
 	Case $helpButton
-		
+		ShellExecute($FPQUI_HELPPATH, "", "", "open")
+		If @error Then _error("Could not open help file at "&$FPQUI_HELPPATH, 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)		
 
 	Case $configPathBrowseButton
 		Local $path = FileOpenDialog(@ScriptName, @ScriptDir, "ini-files (*.ini)|any (*.*)")
@@ -208,11 +210,11 @@ Func _mainLoop()
 		EndIf
 
 	Case $Label5
-		If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
-			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
-		Else
-			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
-		EndIf		
+;~ 		If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
+;~ 			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
+;~ 		Else
+;~ 			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
+;~ 		EndIf		
 
 	Case $Label6
 		If GUICtrlRead($autoDeregisterCheckbox) == 1 Then

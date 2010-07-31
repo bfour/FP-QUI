@@ -30,11 +30,11 @@ GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKBOTTOM+$GUI_DOCKWIDTH+$GUI_DOCKHEI
 Global $Edit3 = GUICtrlCreateEdit("", 8, 8, 441, 65, BitOR($ES_READONLY,$ES_WANTRETURN), 0)
 GUICtrlSetData(-1, StringFormat("This seems to be the first time you have launched FP-QUI or FP-QUICore \r\nwith a new configuration (you can have one configuration per user or \r\nmachine or use other criteria). This assistant helps you with essential \r\nsettings that might affect how FP-QUI works for you."))
 GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKTOP)
-Global $Icon1 = GUICtrlCreateIcon("E:\sabox\grid\FP-QUI\icon.ico", 0, 464, 16, 48, 48, BitOR($SS_NOTIFY,$WS_GROUP))
+Global $Icon1 = GUICtrlCreateIcon(@ScriptDir&"\icon.ico", 0, 464, 16, 48, 48, BitOR($SS_NOTIFY,$WS_GROUP))
 GUICtrlSetResizing(-1, $GUI_DOCKRIGHT+$GUI_DOCKTOP+$GUI_DOCKWIDTH+$GUI_DOCKHEIGHT)
 #EndRegion ### END Koda GUI section ###
 
-GUICtrlSetData($Icon1, @ScriptDir&"\icon.ico")
+GUICtrlSetImage($Icon1, @ScriptDir&"\icon.ico")
 GUICtrlSetData($registerEdit, "This creates an entry in the registry that points to the location of FP-QUI. This allows applications that are designed for FP-QUI to start it on-demand. In other words, if FP-QUICore is not running and an application wants to create a QUI, it might try to start FP-QUICore.exe, but fails if it cannot find it.You may at any time deregister FP-QUI (remove the registry entry) using the ConfigurationAssistant.You may also set an "&Chr(34)&"Auto Register"&Chr(34)&" option, that specifies whether FP-QUICore registers its location every time it"&Chr(39)&"s launched.In addition, you can specify FP-QUICore to deregister itself when it is terminated by enabling the "&Chr(34)&"Auto Deregister"&Chr(34)&" option.")
 GUICtrlSetData($autoStartEdit, "FP-QUICore will be started automatically when you login if this is enabled. This enhances reliability, but consumes memory and some CPU cycles. You may leave this uncheckd, it is optional.")
 GUICtrlSetData($Edit3, "This seems to be the first time you have launched FP-QUI or FP-QUICore with a new configuration (you can have one configuration per user or machine or use other criteria). This assistant helps you with essential settings that might affect how FP-QUI works for you.")

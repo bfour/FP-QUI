@@ -49,13 +49,16 @@ Func _setDefaultConfig($path)
 
 	IniWrite($path,"defaults","font","Segoe UI")
 	IniWrite($path,"defaults","fontSize",18)
+	IniWrite($path,"defaults","iconAviSize",48)
 	
-	IniWrite($path,"behaviour","promptIfNoArguments",0)
+;~ 	IniWrite($path,"behaviour","promptIfNoArguments",0) ;deprecated
 	IniWrite($path,"behaviour","fadeOut",1)
 	IniWrite($path,"behaviour","maxInstances",10)
 	IniWrite($path,"behaviour","autoRegister",1)
 	IniWrite($path,"behaviour","autoDeregister",0)
 	IniWrite($path,"behaviour","firstStart",1)
+	IniWrite($path,"behaviour","showMenuOnFirstStart",1)
+	IniWrite($path,"behaviour","showMenuOnNoArguments",1)
 	
 EndFunc
 
@@ -72,7 +75,7 @@ EndFunc
 Func _addChangeLogEntry($stringArray,$version)
 	
 	_FileWriteToLine($changeLogPath,1,"")
-	_FileWriteToLine($changeLogPath,1,"")
+;~ 	_FileWriteToLine($changeLogPath,1,"")
 
 	For $string In $stringArray
 		_FileWriteToLine($changeLogPath,1,$string)

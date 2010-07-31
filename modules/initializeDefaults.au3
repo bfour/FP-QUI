@@ -34,6 +34,7 @@ Func _initializeDefaults()
 	Global $defaultBkColor			= _iniRead($globalConfigPath, "defaults", "bkColor", 0xFFFF99)
 	Global $defaultTrans			= _iniRead($globalConfigPath, "defaults", "trans", 200)
 	Global $defaultIcon 			= _stringReplaceVariables(_iniRead($globalConfigPath, "defaults", "icon", "@ScriptDir\icon.ico"))
+	Global $defaultIconAviSize		= _iniRead($globalConfigPath, "defaults", "iconAviSize", 48)
 	
 	Global $defaultWidth = 200
 	

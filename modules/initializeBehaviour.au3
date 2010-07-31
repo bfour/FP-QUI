@@ -22,13 +22,16 @@
 
 Func _initializeBehaviour()
 	
-	Global $behaviourPromptIfNoArguments 	= _iniRead($GlobalConfigPath, "behaviour", "promptIfNoArguments", 1)
+;~ 	Global $behaviourPromptIfNoArguments 	= _iniRead($GlobalConfigPath, "behaviour", "promptIfNoArguments", 1)
 	Global $behaviourFadeOut 				= _iniRead($GlobalConfigPath, "behaviour", "fadeOut", 1)
 	Global $behaviourMaxInstances 			= _iniRead($GlobalConfigPath, "behaviour", "maxInstances", 10)
 	Global $behaviourAutoRegister 			= _iniRead($globalConfigPath, "behaviour", "autoRegister", 1)
 	Global $behaviourAutoDeregister 		= _iniRead($globalConfigPath, "behaviour", "autoDeregister", 0)
 	
 	Global $behaviourFirstStart 			= _iniRead($globalConfigPath, "behaviour", "firstStart", 1)
-	Global $behaviourshowFirstStartGUI 		= _iniRead($globalConfigPath, "behaviour", "showFirstStartGUI", 1)
+	Global $behaviourshowFirstStartGUI 		= _iniRead($globalConfigPath, "behaviour", "showFirstStartGUI", 1) ;deprecated
+	
+	Global $behaviourShowMenuOnFirstStart	= _iniRead($globalConfigPath, "behaviour", "showMenuOnFirstStart", 1)
+	Global $behaviourShowMenuOnNoArguments 	= _iniRead($globalConfigPath, "behaviour", "showMenuOnNoArguments", 1)
 	
 EndFunc

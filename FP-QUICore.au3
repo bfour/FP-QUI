@@ -168,7 +168,8 @@
 #include "modules\firstStartHandling.au3"
 
 #include "modules\setBehaviour.au3"
-#include "modules\argumentsPrompt.au3"
+#include "modules\mainMenu.au3"
+#include "modules\trayMainMenu.au3"
 
 Opt("GUIOnEventMode",1)
 
@@ -209,18 +210,10 @@ Func _start()
 			
 			_debug("command line is empty")
 			
-			
-			If $behaviourPromptIfNoArguments==1 Then
-				_debug("calling argumentsPrompt")
-				
-				Local $request=_argumentsPrompt()
-				Opt("GUIOnEventMode",1)
-				
-				_debug("argumentsPrompt returned")
-				If $request=="" Then Exit
-				_debug("forwarding request")
-				_forwardRequest($request)
-				_debug("returned forwarding request")
+			If $behaviourShowMenuOnNoArguments==1 Then
+				_debug("calling mainMenu")
+				_mainMenu(1)
+				_debug("calling mainMenu done")
 			Else
 				Exit
 			EndIf
@@ -229,7 +222,7 @@ Func _start()
 		
 		Exit
 		
-	Else
+	Else ;there is no other instance
 		
 		_debug("singleton returns not 0, piperecv-error: "&@error)
 		
@@ -238,10 +231,12 @@ Func _start()
 		If $behaviourAutoRegister==1 Then _register(0, Default, Default, @ScriptName)
 		If @error<>0 Then _error("Failed to add registry entry.",0,$errorBroadCast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 		_generateDispatcherWindow()
+		_trayMainMenu()
 		
 		DllCall("psapi.dll","int","EmptyWorkingSet","long",-1) ;reduce memory consumption
 		
-		If $CmdLineRaw<>"" Then _processRequest($CmdLineRaw)
+		If $behaviourShowMenuOnFirstStart==1 Then _mainMenu()
+		If $CmdLineRaw<>"" Then _processRequest($CmdLineRaw)	
 			
 		_main()
 		
@@ -944,7 +939,7 @@ _debug("store options end, prepare handles start")
 		Local $iconHandle=""
 		If $icon<>"" Then
 			If $notificationsHandles[$ID][1]=="" Then
-				$iconHandle=GUICtrlCreateIcon("",-1,0,0,48,48)
+				$iconHandle=GUICtrlCreateIcon("",-1,0,0,0,0)
 			Else
 				$iconHandle=$notificationsHandles[$ID][1]
 			EndIf
@@ -957,7 +952,7 @@ _debug("store options end, prepare handles start")
 		Local $aviHandle=""
 		If $avi<>"" Then 
 			If $notificationsHandles[$ID][2]=="" Then
-				$aviHandle=GUICtrlCreateAvi($avi,-1,0,0,48,48)
+				$aviHandle=GUICtrlCreateAvi($avi,-1,0,0,0,0)
 				_GUICtrlAVI_Play($aviHandle)
 			Else
 				$aviHandle=$notificationsHandles[$ID][2]
@@ -1026,7 +1021,7 @@ _debug("prep handles end, set size and pos start")
 		;set size and position
 		
 			;sub-globals
-		Local $spacing = 5
+		Local $spacing = 4
 		Local $cursor = $spacing ;think of it as a cursor, its position shows where a new GUI-item (button etc.) can be inserted (already includes a border between it and the prev item)
 ;~ 		Local $maxY = $spacing ;"lowest" y-point (highest y-value, right after the lowest GUI-item)
 		
@@ -1038,18 +1033,18 @@ _debug("prep handles end, set size and pos start")
 		Else ;else use labelheight
 			$height = $labelSize[1]
 		EndIf
-			
-		If $height < 48+2*$spacing Then ;ensure minimum height
-			$height = 48+2*$spacing
-		EndIf
+		
+		;ensure minimum height
+		If $height < $defaultIconAviSize+2*$spacing	Then $height = $defaultIconAviSize+2*$spacing
+		If $height < $labelSize[1] 					Then $height = $labelSize[1]
 
 		
 			;icon
 		If $icon <> "" Then
 _debug("icon")
 			
-			Local $iconWidth = 48
-			Local $iconHeight = 48
+			Local $iconWidth = $defaultIconAviSize
+			Local $iconHeight = $defaultIconAviSize
 			Local $iconX = $cursor
 			Local $iconY = ($height/2)-($iconHeight/2)
 
@@ -1064,8 +1059,8 @@ _debug("icon")
 			;avi
 		If $avi <> "" Then
 			
-			Local $aviWidth=48
-			Local $aviHeight=48		
+			Local $aviWidth=$defaultIconAviSize
+			Local $aviHeight=$defaultIconAviSize		
 			Local $aviX=$cursor
 			Local $aviY=($height/2)-($aviHeight/2)
 				

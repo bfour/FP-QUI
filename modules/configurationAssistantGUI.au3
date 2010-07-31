@@ -6,7 +6,7 @@
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 
-#Region ### START Koda GUI section ### Form=E:\sabox\grid\FP-QUI\gui\configurationAssistantGUI.kxf
+#Region ### START Koda GUI section ### Form=e:\sabox\grid\fp-qui\gui\configurationassistantgui.kxf
 Global $configurationAssistantGUI = GUICreate("FP-QUIConfigurationAssistant", 858, 347, -1, -1)
 GUISetBkColor(0xFFFFFF)
 Global $cancelButton = GUICtrlCreateButton("Cancel", 616, 288, 115, 49, $BS_DEFPUSHBUTTON)
@@ -23,6 +23,7 @@ Global $Label2 = GUICtrlCreateLabel("Advice: To make FP-QUI portable, you should
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Global $Group2 = GUICtrlCreateGroup("Behaviour", 8, 112, 561, 169)
 Global $promptIfNoArgumentsCheckbox = GUICtrlCreateCheckbox("Prompt if no arguments", 16, 136, 545, 17)
+GUICtrlSetState(-1, $GUI_DISABLE)
 Global $autoRegisterCheckbox = GUICtrlCreateCheckbox("Auto Register. (recommendation: checked)", 16, 176, 545, 17)
 Global $autoDeregisterCheckbox = GUICtrlCreateCheckbox("Auto Deregister (recommendation: unchecked)", 16, 232, 545, 17)
 Global $Label3 = GUICtrlCreateLabel("Automatically stores the location of FP-QUI in the registry when FP-QUICore is launched.", 35, 192, 521, 20)

@@ -170,6 +170,7 @@
 						<property name="Width" vt="Int16">545</property>
 						<property name="Height" vt="Int8">17</property>
 						<property name="Caption" vt="String">Prompt if no arguments</property>
+						<property name="Enabled" vt="False">False</property>
 						<property name="TabOrder" vt="Int8">0</property>
 						<property name="CtrlStyle" vt="Int32">1342242819</property>
 						<property name="CtrlExStyle" vt="Int8">0</property>

@@ -93,7 +93,7 @@ EndIf
 ;ensure notifier is running
 If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist --> not running
 	
-	_runEx(@ScriptDir&"\FP-QUICore.exe")
+	_run(@ScriptDir&"\FP-QUICore.exe")
 	If ProcessWait("FP-QUICore.exe",10)==0 Then
 		_error(@LF&@LF&"FP-QUICore.exe is not running. Please start it manually. FP-QUICore must be running in the background to be able to receive requests.",1,0,0,"","","",1)
 		Exit(-1)
