@@ -1,6 +1,6 @@
 #cs
 
-    FP-QUI allows you to show notifications (popups) in the tray area.
+	FP-QUI allows you to show popups in the tray area.
 	It can be controlled via command line or named pipes.
     Copyright (C) 2010 Florian Pollak
 
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  
 	If not, see http://www.gnu.org/licenses/gpl.html.
-	
+
 	
 	Provides an interface for FP-QUICore. Alternatively, you may use FP-QUICore itself. The syntax is exactly the same. Since FP-QUI only includes the code necessary to process an invoke and communicate with FP-QUICore it should need less resources to be executed.
 	
@@ -76,17 +76,18 @@ EndIf
 
 ;~ _debug("check/ end")
 
-Local $request=$CmdLineRaw
-If $request=="" Then
-	
-	If $behaviourPromptIfNoArguments==1 Then 
-		$request=_argumentsPrompt()
-		If $request=="" Then Exit
-	Else
-		Exit
-	EndIf
-	
-EndIf
+Local $request = $CmdLineRaw
+;~ If $request=="" Then
+;~ 	
+;~ 	If $behaviourPromptIfNoArguments==1 Then 
+;~ 		$request=_argumentsPrompt()
+;~ 		If $request=="" Then Exit
+;~ 	Else
+;~ 		Exit
+;~ 	EndIf
+;~ 	
+;~ EndIf
+If $request == "" Then $request = "<system><menu>1</menu></system>"
 
 ;~ _debug("reqProcess/ end")
 

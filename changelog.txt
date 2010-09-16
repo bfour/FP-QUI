@@ -1,4 +1,10 @@
 ======
+20100916T1808
+
+ - new: command line param "<system><menu>1</menu></system>" will show the menu if it's not visible
+ - when executing FP-QUI.exe without parameters, the menu will be shown instead of the prompt dialog
+
+======
 20100731T1825
 
  - fixed: FP-CodeGeneratorGUI won't create more than four buttons

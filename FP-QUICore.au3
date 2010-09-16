@@ -124,7 +124,9 @@
  31 <delete> ... deletes winHandle, all other arguments are ignored (.exe <delete>0x000000</delete>)
  32 <update> ... if you want to explicitly declare an update (else any request with <winHandle> <> "" will force an update of all attributes of this notification according to the parameters you provided) you may enclose your request in <update> (<update>[request]</update>)
  33 <createIfNotVisible> ... 	<>"": If you update a notification declaring a winhandle and it's not visible this will automatically fall back to creating a new one. This will not work with update, since only part of the signature of the notification is provided (doesn't make sense).
-								=="" (default): no auto create
+								=="" (default): no auto create						
+34 <system>
+	<menu> ... <>"" --> show menu if not yet visible
 	
 	example: <update><winHandle>0x000000</winHandle><text>hello :-)</text></update> will change the text of 0x000000, but will leave all other attributes unchanged
  
@@ -337,7 +339,7 @@ Func _main()
 						Send("{VOLUME_UP 50}")
 					EndIf
 					
-					If _pathGetFileExtension($path)=="wav" Then
+					If _pathGetFileExtension($path)=="wav" OR _pathGetFileExtension($path)=="mp3" Then
 						SoundPlay($path)
 					Else
 						ShellExecute($path,"","","open")
@@ -564,6 +566,12 @@ _debug("process request/update winhandle specified/start")
 		EndIf
 		
 _debug("process request/update winhandle specified/end")
+	
+	ElseIf $options[34][1]<>"" Then ; system
+	MsgBox(1,"","system")
+		Local $instructions = _commandLineInterpreter($options[34][1], "menu")
+		
+		If $instructions[0][1] <> "" Then _mainMenu(0)
 	
 	Else ;generate notif
 
