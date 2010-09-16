@@ -426,7 +426,10 @@ Func _main()
 					And ($repetitions=="" Or $repeat=="" Or $repetitions<$repeat)) _ 
 					) Then 
 					
-					_runEx(@ScriptDir&"\FP-QUITalk.exe "&$string)
+					; try via pipe
+					_pipeSend("FP-QUITalk.exe", $string, 0)
+					; on error, execute executable
+					If @error Then _runEx(@ScriptDir&"\FP-QUITalk.exe "&$string)
 					
 					If $shake<>"" Then _shakeNotification($i)
 		

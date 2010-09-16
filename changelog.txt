@@ -1,4 +1,10 @@
 ======
+20100916T1936
+
+ - new: talk now allows prioritizing: <talk><string><string>[string]</string><priority>[override ... speak immediately, queue ... queue if necessary, drop ... may be dropped [default]]</priority></string></talk> (you can still use the old syntax)
+ - changed: FP-QUITalk.exe will stay in memory for a couple of seconds if new requests are received
+
+======
 20100916T1808
 
  - new: command line param "<system><menu>1</menu></system>" will show the menu if it's not visible
