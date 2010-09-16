@@ -571,9 +571,8 @@ _debug("process request/update winhandle specified/start")
 _debug("process request/update winhandle specified/end")
 	
 	ElseIf $options[34][1]<>"" Then ; system
-	MsgBox(1,"","system")
-		Local $instructions = _commandLineInterpreter($options[34][1], "menu")
-		
+
+		Local $instructions = _commandLineInterpreter($options[34][1], "menu")		
 		If $instructions[0][1] <> "" Then _mainMenu(0)
 	
 	Else ;generate notif
