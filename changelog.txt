@@ -1,4 +1,9 @@
 ======
+20100920T1413
+
+ - change: autoRegister-default = 0 (avoids registering on first start even if user chooses not to add reg entry)
+
+======
 20100920T1407
 
  - fix: FP-QUITalk requests with priority drop are in fact not dropped

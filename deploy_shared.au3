@@ -54,7 +54,7 @@ Func _setDefaultConfig($path)
 ;~ 	IniWrite($path,"behaviour","promptIfNoArguments",0) ;deprecated
 	IniWrite($path,"behaviour","fadeOut",1)
 	IniWrite($path,"behaviour","maxInstances",10)
-	IniWrite($path,"behaviour","autoRegister",1)
+	IniWrite($path,"behaviour","autoRegister",0)
 	IniWrite($path,"behaviour","autoDeregister",0)
 	IniWrite($path,"behaviour","firstStart",1)
 	IniWrite($path,"behaviour","showMenuOnFirstStart",1)
