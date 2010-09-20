@@ -1,4 +1,9 @@
 ======
+20100920T1407
+
+ - fix: FP-QUITalk requests with priority drop are in fact not dropped
+
+======
 20100916T1936
 
  - new: talk now allows prioritizing: <talk><string><string>[string]</string><priority>[override ... speak immediately, queue ... queue if necessary, drop ... may be dropped [default]]</priority></string></talk> (you can still use the old syntax)

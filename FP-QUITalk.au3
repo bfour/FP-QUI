@@ -69,12 +69,13 @@ Func _main()
 		$buffer = _pipeReceive($pipeName, 0)
 		
 		If $buffer<>"" Then
-			_addRequest($buffer)
 			$timer = TimerInit()
+			_addRequest($buffer)
 			If Not @error Then ContinueLoop ; if queue not yet full, continue
 		EndIf
 			
 		_processQueue()
+		
 		Sleep($clock)
 		
 	WEnd
@@ -93,7 +94,7 @@ Func _addRequest($request)
 		$priority = "drop"
 	ElseIf $priority=="" Then
 		$priority = "drop"
-	Else
+	ElseIf $string=="" Then
 		; string empty
 		SetError(1)
 		Return ""
@@ -108,13 +109,18 @@ EndFunc
 Func _processQueue()
 	
 ;~ 	_ArrayDisplay($queue)
+	Local $localTimer = TimerInit()
 	
-	While 1		
+	While TimerDiff($localTimer) < 3000	
+		
 		Local $index = _getQueue($queue)
-		If $index=="" Then Return 1		
+		If $index=="" Then Return 1
+			
+		$timer = TimerInit()
 		_talk($queue[$index][2])
 		_removeQueue($queue, $index)		
 		Sleep(10)		
+		
 	WEnd
 	
 EndFunc
@@ -152,17 +158,23 @@ Func _cleanQueue(ByRef $queue)
 	
 	;remove drop-entries if others exist
 	Local $othersExist = 0
+	Local $dropCounter = 0
 	For $i=0 To UBound($queue)-1
-		If $queue[$i][1] == "override" Or $queue[$i][1] == "queue" Then
-			$othersExist=1
-			ExitLoop
+		If $othersExist==0 And ($queue[$i][1] == "override" Or $queue[$i][1] == "queue") Then
+			$othersExist = 1
+		ElseIf $queue[$i][1] == "drop" Then
+			$dropCounter += 1
 		EndIf
 	Next
 	
-	If $othersExist == 0 Then Return 1
+;~ ToolTip($dropCounter)
 	
 	For $i=UBound($queue)-1 To 0 Step -1
-		If $queue[$i][1] == "drop" Then $queue[$i][0] = 0
+		If $othersExist == 0 And $dropCounter <= 1 Then Return 1
+		If $queue[$i][1] == "drop" Then 
+			$queue[$i][0] = 0
+			$dropCounter -= 1
+		EndIf
 	Next
 	
 EndFunc
