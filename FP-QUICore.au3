@@ -132,8 +132,6 @@
  
 #ce ----------------------------------------------------------------------------
 
-;~ #NoTrayIcon
-
 #include <String.au3>
 #include <WindowsConstants.au3>
 #include <Constants.au3>
@@ -165,6 +163,12 @@
 #include "modules\supporter.au3"
 #include "modules\executeCommand.au3"
 #include "modules\register.au3"
+
+#include "modules\doCheckLifetime.au3"
+#include "modules\doAudio.au3"
+#include "modules\doBeep.au3"
+#include "modules\doTalk.au3"
+#include "modules\doRun.au3"
 
 #include "modules\forwardRequest.au3"
 #include "modules\firstStartHandling.au3"
@@ -266,186 +270,16 @@ Func _main()
 		
 		If $loadBounceCounter < 10 And $request<>"" Then ContinueLoop
 
-		
 		For $i=1 To UBound($notificationsHandles)-1
-			
-;~ 			;set optimal size and position
-;~ 			_setOptimalSize($i)
-;~ 			_setOptimalPos($i)
-
-
-			;delay, until etc.
-			If ( _ 
-				($notificationsOptions[$i][1]<>"" And TimerDiff($notificationsOptionsData[$i][1])>=$notificationsOptions[$i][1]) Or _ ;delay
-				($notificationsOptions[$i][8]<>"" And ProcessExists($notificationsOptions[$i][8])<>0) Or _ ;untilProcessExists
-				($notificationsOptions[$i][9]<>"" And ProcessExists($notificationsOptions[$i][9])==0) _ ;untilProcessClose
-			   ) _ 
-			Then 
-				_hideNotification($i)
-			EndIf
-
-
-			;run
-			If $notificationsOptions[$i][23]<>"" Then
-				
-				Local $run=_commandLineInterpreter($notificationsOptions[$i][23],"cmd;repeat;pause")
-				Local $cmd=$run[0][1]
-				Local $repeat=$run[1][1]
-				Local $pause=$run[2][1]
-				
-				;avoid unexpected behaviour
-				If $repeat=="" And $pause=="" Then $repeat=1
-				If $pause<1000 Then $pause=1000
-				
-				Local $runData=_commandLineInterpreter($notificationsOptionsData[$i][23],"timer;repetitions")
-				Local $timer=$runData[0][1]
-				Local $repetitions=$runData[1][1]
-				
-				If (($timer=="" Or $pause=="" Or TimerDiff($timer)>$pause) And ($repetitions=="" Or $repeat=="" Or $repetitions<$repeat)) Then 
-					
-					_executeCommand($cmd)
-					
-					If $pause<>"" Then $timer=TimerInit() ;only store timer if relevant
-					If $repeat<>"" Then $repetitions+=1 ;only store repetitions if relevant
-					$notificationsOptionsData[$i][23]="<timer>"&$timer&"</timer><repetitions>"&$repetitions&"</repetitions>"
-					
-				EndIf
-				
-			EndIf
-			
-		
-			;audio
-			If $notificationsOptions[$i][20]<>"" Then
-				
-				Local $audio=_commandLineInterpreter($notificationsOptions[$i][20],"path;repeat;pause;maxVol;shake")
-				Local $path=$audio[0][1]
-				Local $repeat=$audio[1][1]
-				Local $pause=$audio[2][1]
-				Local $maxVol=$audio[3][1]
-				Local $shake=$audio[4][1]
-				
-				;avoid unexpected behaviour
-				If $repeat=="" And $pause=="" Then $repeat=1
-				If $pause<1000 Then $pause=1000
-					
-				Local $audioData=_commandLineInterpreter($notificationsOptionsData[$i][20],"timer;repetitions")
-				Local $timer=$audioData[0][1]
-				Local $repetitions=$audioData[1][1]
-				
-				If (($timer=="" Or $pause=="" Or TimerDiff($timer)>$pause) And ($repetitions=="" Or $repeat=="" Or $repetitions<$repeat)) Then 
-					
-					If $maxVol<>"" Then 
-						SoundSetWaveVolume(100)
-						Send("{VOLUME_UP 50}")
-					EndIf
-					
-					If _pathGetFileExtension($path)=="wav" OR _pathGetFileExtension($path)=="mp3" Then
-						SoundPlay($path)
-					Else
-						ShellExecute($path,"","","open")
-					EndIf
-					
-					If FileExists($path)==0 Then _error('"'&$path&'" does not exist and cannot be played',$errorInteractive,$errorBroadCast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
-					
-					If $shake<>"" Then _shakeNotification($i)
-		
-					If $pause<>"" Then $timer=TimerInit() ;only store timer if relevant
-					If $repeat<>"" Then $repetitions+=1 ;only store repetitions if relevant
-					$notificationsOptionsData[$i][20]="<timer>"&$timer&"</timer><repetitions>"&$repetitions&"</repetitions>"
-					
-				EndIf
-				
-			EndIf
-			
-			
-			;beep
-			If $notificationsOptions[$i][12]<>"" Then
-				
-				Local $beep=_commandLineInterpreter($notificationsOptions[$i][12],"string;repeat;pause;shake")
-				Local $string=$beep[0][1]
-				Local $repeat=$beep[1][1]
-				Local $pause=$beep[2][1]
-				Local $shake=$beep[3][1]
-				
-				;avoid unexpected behaviour
-				If $repeat=="" And $pause=="" Then $repeat=1
-				If $pause<1000 Then $pause=1000
-				
-				Local $beepData=_commandLineInterpreter($notificationsOptionsData[$i][12],"timer;repetitions")
-				Local $timer=$beepData[0][1]
-				Local $repetitions=$beepData[1][1]
-				
-				If (($timer=="" Or $pause=="" Or TimerDiff($timer)>$pause) And ($repetitions=="" Or $repeat=="" Or $repetitions<$repeat)) Then 
-					
-					_runEx(@ScriptDir&"\FP-QUIBeeper.exe <beep>"&$string&"</beep>")
-					
-					If $shake<>"" Then _shakeNotification($i)
-		
-					If $pause<>"" Then $timer=TimerInit() ;only store timer if relevant
-					If $repeat<>"" Then $repetitions+=1 ;only store repetitions if relevant
-					$notificationsOptionsData[$i][12]="<timer>"&$timer&"</timer><repetitions>"&$repetitions&"</repetitions>"
-					
-				EndIf
-				
-			EndIf
-
-			;talk
-			If $notificationsOptions[$i][15]<>"" Then
-				
-				Local $talk=_commandLineInterpreter($notificationsOptions[$i][15],"string;repeat;pause;shake")
-			
-				Local $string=$talk[0][1]
-					  $string = StringReplace($string,"%text%",$notificationsOptions[$i][0])
-				Local $repeat=$talk[1][1]
-				Local $pause=$talk[2][1]
-				Local $shake=$talk[3][1]
-				
-				;avoid unexpected behaviour
-				If $repeat=="" And $pause=="" Then $repeat=1
-				If $pause<1000 Then $pause=1000
-			
-;backwd compat (string only)
-				If $talk[0][1] = "" And $talk[1][1] == "" And $talk[2][1] == "" And $talk[3][1] == "" Then
-					Local $string=$notificationsOptions[$i][15]
-						  $string = StringReplace($string,"%text%",$notificationsOptions[$i][0])
-					Local $repeat=1
-					Local $pause=""
-					Local $shake=""
-				EndIf
-;/backwd compat
-				
-				Local $talkData=_commandLineInterpreter($notificationsOptionsData[$i][15],"string;timer;repetitions")
-				Local $previousString=$talkData[0][1]
-				Local $timer=$talkData[1][1]
-				Local $repetitions=$talkData[2][1]
-				
-				
-				
-				If	($previousString <> $string Or _
-					(($timer=="" Or $pause=="" Or TimerDiff($timer)>$pause) _ 
-					And ($repetitions=="" Or $repeat=="" Or $repetitions<$repeat)) _ 
-					) Then 
-					
-					; try via pipe
-					_pipeSend("FP-QUITalk.exe", $string, 0)
-					; on error, execute executable
-					If @error Then _runEx(@ScriptDir&"\FP-QUITalk.exe "&$string)
-					
-					If $shake<>"" Then _shakeNotification($i)
-		
-					If $pause<>"" Then $timer=TimerInit() ;only store timer if relevant
-					If $repeat<>"" Then $repetitions+=1 ;only store repetitions if relevant
-					$notificationsOptionsData[$i][15]="<string>"&$string&"</string><timer>"&$timer&"</timer><repetitions>"&$repetitions&"</repetitions>"
-					
-				EndIf
-				
-			EndIf
-			
+			_doCheckLifetime($i) ; delay, until etc.
+			_doRun($i)
+			_doAudio($i)
+;~ 			MsgBox(1,"did audio for "&$i, @error&@LF&@extended)
+			_doBeep($i)
+			_doTalk($i)
 		Next
 
-
 		_processNotificationsDeleteRequests()
-		
 		
 		;adjust loopPause, based on request and existing notifications
 		If UBound($notificationsHandles)<=1 And $request=="" Then 
@@ -1390,7 +1224,12 @@ Func _processNotificationsDeleteRequests()
 
 		If $ID <> "" Then
 
+			; delte GUI
 			GUIDelete($deleteRequest[$i])
+			
+			; close sound handle
+			_SoundClose($notificationsOptionsData[$i][21])
+			If @error Then _error('failed to close sound, @error='&@error, 0, 0, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
 
 			;delete entries as specified
 			_ArrayDelete($notificationsHandles,$ID)
