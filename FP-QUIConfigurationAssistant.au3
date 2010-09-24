@@ -46,6 +46,8 @@ _mainLoop()
 
 Func _assureEnvironment()
 	
+	Global $currentFontColorSelection = Default
+	
 	;if config-dir does not exists, create it
 	Local $configDir = _pathGetDir($globalConfigPath)
 	If DirGetSize($configDir,2)==-1 Then DirCreate($configDir)
@@ -54,7 +56,7 @@ Func _assureEnvironment()
 	If Not FileExists($configDir) Then 
 		If FileInstall(".\data\config_global.ini", ".\data\config_global.ini", 0)==0 Then _error("global config is missing, tried copying, failed", $errorInteractive, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines)
 	EndIf
-	
+		
 EndFunc
 
 Func _initializeGUI()
@@ -281,15 +283,21 @@ Func _mainLoop()
 		GUICtrlSetData($minimumFontSizeInput, 12)
 
 	Case $selectFontButton
-		Local $font = _ChooseFont(GUICtrlRead($fontInput), GUICtrlRead($fontSizeInput))
+		Local $font = _ChooseFont(GUICtrlRead($fontInput), GUICtrlRead($fontSizeInput), $currentFontColorSelection)
 		If $font <> -1 And IsArray($font) Then
 			GUICtrlSetData($fontInput, $font[2])
 			GUICtrlSetData($fontSizeInput, $font[3])
 			GUICtrlSetData($textColorInput, $font[7])
+			$currentFontColorSelection = $font[5]
 		EndIf
 
 	Case $fontPropertiesDefaultButton
-		GUICtrlSetData($fontInput, "Segoe UI")
+		
+		If @OSVersion == "WIN_2003" OR @OSVersion == "WIN_XP" OR @OSVersion == "WIN_2000" Then 
+			GUICtrlSetData($fontInput, "Arial")
+		Else
+			GUICtrlSetData($fontInput, "Segoe UI")
+		EndIf
 		GUICtrlSetData($fontSizeInput, 16)
 		GUICtrlSetData($textColorInput, Default)
 

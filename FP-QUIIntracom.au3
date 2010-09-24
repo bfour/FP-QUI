@@ -86,6 +86,9 @@ If $return<>1 Then
 		Case "pipe"
 			_pipeSend($errorPipe, $errorMsg)
 			
+		Case "log"
+			_error($errorMsg,0,0,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
+			
 	EndSwitch
 			
 EndIf
