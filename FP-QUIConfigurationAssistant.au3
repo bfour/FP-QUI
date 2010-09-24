@@ -73,19 +73,19 @@ Func _initializeGUI()
 	
 	
 	;behaviour
-	If $behaviourShowMenuOnFirstStart Then
+	If $behaviourShowMenuOnFirstStart == 1 Then
 		GUICtrlSetState($showMenuOnFirstStartCheckbox, $GUI_CHECKED)
 	Else
 		GUICtrlSetState($showMenuOnFirstStartCheckbox, $GUI_UNCHECKED)
 	EndIf
 	
-	If $behaviourAutoRegister Then
+	If $behaviourAutoRegister == 1 Then
 		GUICtrlSetState($autoRegisterCheckbox, $GUI_CHECKED)
 	Else
 		GUICtrlSetState($autoRegisterCheckbox, $GUI_UNCHECKED)
 	EndIf
 	
-	If $behaviourAutoDeregister Then
+	If $behaviourAutoDeregister == 1 Then
 		GUICtrlSetState($autoDeregisterCheckbox, $GUI_CHECKED)
 	Else
 		GUICtrlSetState($autoDeregisterCheckbox, $GUI_UNCHECKED)

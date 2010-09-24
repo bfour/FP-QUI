@@ -1,4 +1,14 @@
 ======
+20100924T0408
+
+ - fix: FP-QUIConfigurationAssistant: loading wrong checkbox-settings on init
+
+======
+20100924T0402
+
+ - change: FP-QUICore no longer logs failure of _SoundClose (func is called whether or not theres a soundID)
+
+======
 20100924T0332
 
  - change: FP-QUIConfigurationAssistant: set Arial as default font if OS = Win XP or 2003 or 2000
