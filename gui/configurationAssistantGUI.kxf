@@ -163,21 +163,6 @@
 				<property name="Resizing" vt="Set"/>
 			</properties>
 			<components>
-				<object type="TACheckbox" name="promptIfNoArgumentsCheckbox">
-					<properties>
-						<property name="Left" vt="Int8">8</property>
-						<property name="Top" vt="Int8">24</property>
-						<property name="Width" vt="Int16">545</property>
-						<property name="Height" vt="Int8">17</property>
-						<property name="Caption" vt="String">Prompt if no arguments</property>
-						<property name="Enabled" vt="False">False</property>
-						<property name="TabOrder" vt="Int8">0</property>
-						<property name="CtrlStyle" vt="Int32">1342242819</property>
-						<property name="CtrlExStyle" vt="Int8">0</property>
-						<property name="Resizing" vt="Set">DockHeight</property>
-					</properties>
-					<components/>
-				</object>
 				<object type="TACheckbox" name="autoRegisterCheckbox">
 					<properties>
 						<property name="Left" vt="Int8">8</property>
@@ -185,7 +170,7 @@
 						<property name="Width" vt="Int16">545</property>
 						<property name="Height" vt="Int8">17</property>
 						<property name="Caption" vt="String">Auto Register. (recommendation: checked)</property>
-						<property name="TabOrder" vt="Int8">1</property>
+						<property name="TabOrder" vt="Int8">0</property>
 						<property name="CtrlStyle" vt="Int32">1342242819</property>
 						<property name="CtrlExStyle" vt="Int8">0</property>
 						<property name="Resizing" vt="Set">DockHeight</property>
@@ -199,22 +184,7 @@
 						<property name="Width" vt="Int16">521</property>
 						<property name="Height" vt="Int8">20</property>
 						<property name="Caption" vt="String">Automatically stores the location of FP-QUI in the registry when FP-QUICore is launched.</property>
-						<property name="TabOrder" vt="Int8">3</property>
-						<property name="HaveVariable" vt="False">False</property>
-						<property name="CtrlStyle" vt="Int32">1342177536</property>
-						<property name="CtrlExStyle" vt="Int8">0</property>
-						<property name="Resizing" vt="Set"/>
-					</properties>
-					<components/>
-				</object>
-				<object type="TALabel" name="Label5">
-					<properties>
-						<property name="Left" vt="Int8">27</property>
-						<property name="Top" vt="Int8">40</property>
-						<property name="Width" vt="Int16">477</property>
-						<property name="Height" vt="Int8">20</property>
-						<property name="Caption" vt="String">Shows a GUI when FP-QUI or FP-QUICore are launched without any parameters.</property>
-						<property name="TabOrder" vt="Int8">4</property>
+						<property name="TabOrder" vt="Int8">2</property>
 						<property name="HaveVariable" vt="False">False</property>
 						<property name="CtrlStyle" vt="Int32">1342177536</property>
 						<property name="CtrlExStyle" vt="Int8">0</property>
@@ -229,7 +199,7 @@
 						<property name="Width" vt="Int16">545</property>
 						<property name="Height" vt="Int8">17</property>
 						<property name="Caption" vt="String">Auto Deregister (recommendation: unchecked)</property>
-						<property name="TabOrder" vt="Int8">2</property>
+						<property name="TabOrder" vt="Int8">1</property>
 						<property name="CtrlStyle" vt="Int32">1342242819</property>
 						<property name="CtrlExStyle" vt="Int8">0</property>
 						<property name="Resizing" vt="Set">DockHeight</property>
@@ -243,7 +213,7 @@
 						<property name="Width" vt="Int16">437</property>
 						<property name="Height" vt="Int8">20</property>
 						<property name="Caption" vt="String">Deregisters FP-QUI when FP-QUICore is terminated normally (not forced).</property>
-						<property name="TabOrder" vt="Int8">5</property>
+						<property name="TabOrder" vt="Int8">3</property>
 						<property name="HaveVariable" vt="False">False</property>
 						<property name="CtrlStyle" vt="Int32">1342177536</property>
 						<property name="CtrlExStyle" vt="Int8">0</property>
@@ -258,6 +228,35 @@
 						<property name="Width" vt="Int16">512</property>
 						<property name="Height" vt="Int8">20</property>
 						<property name="Caption" vt="String">This helps other applications to find FP-QUI and thereby greatly improves its reliability.</property>
+						<property name="TabOrder" vt="Int8">4</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342177536</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+				<object type="TACheckbox" name="showMenuOnFirstStartCheckbox">
+					<properties>
+						<property name="Left" vt="Int8">8</property>
+						<property name="Top" vt="Int8">24</property>
+						<property name="Width" vt="Int16">545</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Caption" vt="String">Show Menu on First Start</property>
+						<property name="TabOrder" vt="Int8">5</property>
+						<property name="CtrlStyle" vt="Int32">1342242819</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set">DockHeight</property>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="Label4">
+					<properties>
+						<property name="Left" vt="Int8">27</property>
+						<property name="Top" vt="Int8">40</property>
+						<property name="Width" vt="Int16">523</property>
+						<property name="Height" vt="Int8">20</property>
+						<property name="Caption" vt="String">Specifies whether the main menu is shown when a first instance of FP-QUICore is started.</property>
 						<property name="TabOrder" vt="Int8">6</property>
 						<property name="HaveVariable" vt="False">False</property>
 						<property name="CtrlStyle" vt="Int32">1342177536</property>
@@ -285,9 +284,9 @@
 					<properties>
 						<property name="Left" vt="Int8">8</property>
 						<property name="Top" vt="Int16">184</property>
-						<property name="Width" vt="Int8">85</property>
+						<property name="Width" vt="Int8">43</property>
 						<property name="Height" vt="Int8">20</property>
-						<property name="Caption" vt="String">Default height</property>
+						<property name="Caption" vt="String">Height</property>
 						<property name="TabOrder" vt="Int8">3</property>
 						<property name="HaveVariable" vt="False">False</property>
 						<property name="CtrlStyle" vt="Int32">1342178048</property>

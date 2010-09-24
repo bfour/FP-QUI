@@ -20,6 +20,8 @@
 	
 #ce
 
+#NoTrayIcon
+
 #Include <Misc.au3>
 #Include <GuiComboBox.au3>
 #Include <GuiListView.au3>

@@ -13,6 +13,7 @@
 #include <_error.au3>
 #include <_setAutoStart.au3>
 #include <_config.au3>
+#include <_fpqui.au3>
 
 #include "modules\vars.au3"
 #include "modules\initializeErrorHandling.au3"
@@ -49,6 +50,21 @@ Func _initialize()
 	If Not FileExists($coreExePath) Then
 		_error($coreExePath&' ($coreExePath) does not exist.', $errorInteractive, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
 		Exit(4) ;internal error
+	EndIf
+	
+	; auto optimize font selection
+	If @OSVersion == "WIN_2003" OR @OSVersion == "WIN_XP" OR @OSVersion == "WIN_2000" Then 
+		
+		_setConfiguration("defaults", "font", "Arial")
+		Local $return = _fpqui("<system><reinitDefaults>1</reinitDefaults></system>", Default, 0, _ 
+				"<coreNotRunning>return</coreNotRunning><requestFailed>return</requestFailed>"& _ 
+				"<sendMaxRetries>8</sendMaxRetries><sendRetryPause>100</sendRetryPause>"& _ 
+				"<receiveMaxRetries>0</receiveMaxRetries><receiveRetryPause>0</receiveRetryPause>", _ 
+				Default, Default)
+		
+		; we're awaiting no response --> errCode 4
+		If @error<>4 Then _error('Segoe UI does not seem to be installed. Falling back to Arial. Please restart FP-QUICore.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+			
 	EndIf
 
 	_generateFirstStartGUI()
@@ -145,7 +161,7 @@ Func _mainLoop()
 			;show report
 			MsgBox(0+64, @ScriptName, $reportString)
 			;set first start to 0
-			_setConfiguration("behaviour",  "firstStart", 0)
+			_setConfiguration("behaviour", "firstStart", 0)
 			Exit
 			
 		Case $helpButton

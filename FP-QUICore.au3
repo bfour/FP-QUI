@@ -126,7 +126,11 @@
  33 <createIfNotVisible> ... 	<>"": If you update a notification declaring a winhandle and it's not visible this will automatically fall back to creating a new one. This will not work with update, since only part of the signature of the notification is provided (doesn't make sense).
 								=="" (default): no auto create						
 34 <system>
-	<menu> ... <>"" --> show menu if not yet visible
+	multiple instructions are allowed at the same time:
+	<menu> 				... <>"" --> show menu if not yet visible
+	<reinitDefaults> 	... <>"" --> reinitialize defaults
+	<reinitBehaviour> 	... <>"" --> reinitialize behaviour
+	<reinitColors> 		... <>"" --> reinitialize colors
 	
 	example: <update><winHandle>0x000000</winHandle><text>hello :-)</text></update> will change the text of 0x000000, but will leave all other attributes unchanged
  
@@ -406,8 +410,25 @@ _debug("process request/update winhandle specified/end")
 	
 	ElseIf $options[34][1]<>"" Then ; system
 
-		Local $instructions = _commandLineInterpreter($options[34][1], "menu")		
-		If $instructions[0][1] <> "" Then _mainMenu(0)
+		Local $instructions = _commandLineInterpreter($options[34][1])
+		
+		For $j=0 To UBound($instructions)-1
+			
+			Switch $instructions[$j][0]
+				
+			Case "menu"
+				If $instructions[$j][1] <> "" Then _mainMenu(0)
+			Case "reinitDefaults"
+				If $instructions[$j][1] <> "" Then _initializeDefaults()
+			Case "reinitBehaviour"
+				If $instructions[$j][1] <> "" Then _initializeBehaviour()
+			Case "reinitColors"
+				If $instructions[$j][1] <> "" Then _initializeColors()
+			EndSwitch
+				
+			$reply = "ACK"
+			
+		Next
 	
 	Else ;generate notif
 
@@ -419,17 +440,18 @@ _debug("process request/update winhandle specified/end")
 
 
 	;reply (even if no notif has been created because it's not unique but has to be)
+	$reply = "<reply>"&$reply&"</reply>"
 	Local $replyInstructions=_commandLineInterpreter($options[27][1],"pipe;stdout")
 	Local $replyPipe = $replyInstructions[0][1]
 
 		;via pipe
 	If $replyInstructions[0][1]<>"" Then
-
+		
 		;try once (we have to be quick, this is one single thread)
 		If _pipeSend($replyPipe,$reply,0) <> 1 Then
 			
 			;if that doesn't work, delegate this task to another process (this one shall not be interrupted)
-			Local $return=_runEx(@ScriptDir&"\FP-QUIIntracom.exe <recip>"&$replyPipe&"</recip><msg>"&$reply&"</msg><errorMode>pipe</errorMode><errorPipe>FP-QUI</errorPipe><errorMsg><text>FP-QUIIntracom failed to handle a pipe transaction.</text><ico>"&@ScriptDir&"\icon.ico</ico></errorMsg><retryPause>1000</retryPause><maxRetries>20</maxRetries>")
+			Local $return=_runEx(@ScriptDir&"\FP-QUIIntracom.exe <recip>"&$replyPipe&"</recip><msg>"&$reply&"</msg><errorMode>pipe</errorMode><errorModePipe>FP-QUI</errorModePipe><errorMsg><text>FP-QUIIntracom failed to handle a pipe transaction: $replyPipe="&$replyPipe&"; $reply="&$reply&"</text><ico>"&@ScriptDir&"\icon.ico</ico></errorMsg><retryPause>1000</retryPause><maxRetries>20</maxRetries>")
 			
 		EndIf
 		

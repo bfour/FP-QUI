@@ -27,6 +27,7 @@
 #include <_config.au3>
 #include <_path.au3>
 #include <_error.au3>
+#include <_fpqui.au3>
 
 #include "modules\vars.au3"
 #include "modules\initializeErrorHandling.au3"
@@ -70,11 +71,11 @@ Func _initializeGUI()
 	
 	
 	;behaviour
-;~ 	If $behaviourPromptIfNoArguments Then
-;~ 		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
-;~ 	Else
-;~ 		GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
-;~ 	EndIf
+	If $behaviourShowMenuOnFirstStart Then
+		GUICtrlSetState($showMenuOnFirstStartCheckbox, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($showMenuOnFirstStartCheckbox, $GUI_UNCHECKED)
+	EndIf
 	
 	If $behaviourAutoRegister Then
 		GUICtrlSetState($autoRegisterCheckbox, $GUI_CHECKED)
@@ -128,11 +129,11 @@ Func _save()
 	
 	
 	;behaviour
-;~ 	If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
-;~ 		_setConfiguration("behaviour", "promptIfNoArguments", 1)
-;~ 	Else
-;~ 		_setConfiguration("behaviour", "promptIfNoArguments", 0)
-;~ 	EndIf
+	If GUICtrlRead($showMenuOnFirstStartCheckbox) == 1 Then
+		_setConfiguration("behaviour", "showMenuOnFirstStart", 1)
+	Else
+		_setConfiguration("behaviour", "showMenuOnFirstStart", 0)
+	EndIf
 
 	If GUICtrlRead($autoRegisterCheckbox) == 1 Then
 		_setConfiguration("behaviour", "autoRegister", 1)
@@ -148,13 +149,13 @@ Func _save()
 	
 	
 	;defaults
-	_setConfiguration("defaults", "font", GUICtrlRead($fontInput))
-	_setConfiguration("defaults", "fontSize", GUICtrlRead($fontSizeInput))
-	_setConfiguration("defaults", "textColor", GUICtrlRead($textColorInput))
-	_setConfiguration("defaults", "minimumFontSize", GUICtrlRead($minimumFontSizeInput))
-	_setConfiguration("defaults", "bkColor", GUICtrlRead($bkColorCombo))
-	_setConfiguration("defaults", "height", GUICtrlRead($heightInput))
-	_setConfiguration("defaults", "trans", GUICtrlRead($transInput))
+	_setConfiguration("defaults", "font", 				GUICtrlRead($fontInput))
+	_setConfiguration("defaults", "fontSize", 			GUICtrlRead($fontSizeInput))
+	_setConfiguration("defaults", "textColor", 			GUICtrlRead($textColorInput))
+	_setConfiguration("defaults", "minimumFontSize", 	GUICtrlRead($minimumFontSizeInput))
+	_setConfiguration("defaults", "bkColor", 			GUICtrlRead($bkColorCombo))
+	_setConfiguration("defaults", "height", 			GUICtrlRead($heightInput))
+	_setConfiguration("defaults", "trans", 				GUICtrlRead($transInput))
 	
 	If GUICtrlRead($fadeOutCheckbox) == 1 Then
 		_setConfiguration("behaviour", "fadeOut", 1)
@@ -171,8 +172,66 @@ Func _save()
 ;~ 		$colorValue = _GUICtrlListBox_GetItemData($colorsListBox, $i)
 ;~ 		_setConfiguration("colors", $colorName, $colorValue)
 ;~ 	Next
+
+	_hideConfigurationAssistantGUI()
+;~ 	_promptForRestart()
+	_reinitCore()
+	_showTestQUI()
 	
 EndFunc
+
+Func _reinitCore()
+	
+	Local $return
+	
+	$return = _fpqui("<system><reinitDefaults>1</reinitDefaults><reinitBehaviour>1</reinitBehaviour><reinitColors>1</reinitColors></system>", Default, 0, _ 
+			"<coreNotRunning>return</coreNotRunning><requestFailed>return</requestFailed>"& _ 
+			"<sendMaxRetries>8</sendMaxRetries><sendRetryPause>100</sendRetryPause>"& _ 
+			"<receiveMaxRetries>0</receiveMaxRetries><receiveRetryPause>0</receiveRetryPause>", _ 
+			Default, Default)
+
+	; we're awaiting no response --> errCode 4
+	Local $error = @error
+	If $error>=8 Then _error('Failed to reinitialize FP-QUICore. Please restart FP-QUICore manually. error='&$error, 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+	
+EndFunc
+
+Func _showTestQUI()
+	
+	Local $return
+	
+	$return = _fpqui("<text>new configuration applied</text><ico>@ScriptDir\icon.ico</ico><replaceVars>1</replaceVars><delay>5000</delay>", Default, 1, _ 
+			"<coreNotRunning>tryAndReturn</coreNotRunning>")
+
+;~ 	If @error Then _error('Failed to create test-QUI: @error='&@error, 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)	
+	;TODO fix error (always returns 4 responseFailed)
+	
+EndFunc
+
+;~ Func _promptForRestart()
+;~ 	
+;~ 	If ProcessExists("FP-QUICore.exe") Then
+;~ 		
+;~ 		Local $answer = MsgBox(4+32, "FP-QUIConfigurationAssistant", "New configuration has been saved to "&_iniFinalPath($globalConfigPath)&". In order for changes to take effect FP-QUICore has to be restarted. Current QUIs will be lost. Do you wish to restart FP-QUICore now?")
+;~ 		
+;~ 		If $answer == 6 Then ; yes
+;~ 			
+;~ 			Local $corePath = @ScriptDir&"\FP-QUICore.exe" ;TODO change to more secure method
+;~ 			
+;~ 			If FileExists($corePath) == 0 Then 
+;~ 				_error('Failed to find FP-QUICore executable at "'&$corePath&'". Restart aborted.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+;~ 			Else
+;~ 				ProcessClose("FP-QUICore.exe")
+;~ 				Run($corePath)
+;~ 				If @error Then _error('Failed to start FP-QUICore. Please restart manually.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+;~ 			EndIf
+;~ 			
+;~ 		EndIf
+;~ 		
+;~ 	EndIf
+;~ 	
+;~ EndFunc
+
 
 Func _mainLoop()
 	
@@ -203,25 +262,13 @@ Func _mainLoop()
 		_GUICtrlComboBox_SetEditText($configPathCombo, "@ScriptDir\data\config_@UserName_@ComputerName.ini")
 
 	Case $Label3
-		If GUICtrlRead($autoRegisterCheckbox) == 1 Then
-			GUICtrlSetState($autoRegisterCheckbox, $GUI_UNCHECKED)
-		Else
-			GUICtrlSetState($autoRegisterCheckbox, $GUI_CHECKED)
-		EndIf
+		_toggleCheckbox($autoRegisterCheckbox)	
 
-	Case $Label5
-;~ 		If GUICtrlRead($promptIfNoArgumentsCheckbox) == 1 Then
-;~ 			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_UNCHECKED)
-;~ 		Else
-;~ 			GUICtrlSetState($promptIfNoArgumentsCheckbox, $GUI_CHECKED)
-;~ 		EndIf		
+	Case $Label4
+		_toggleCheckbox($showMenuOnFirstStartCheckbox)	
 
 	Case $Label6
-		If GUICtrlRead($autoDeregisterCheckbox) == 1 Then
-			GUICtrlSetState($autoDeregisterCheckbox, $GUI_UNCHECKED)
-		Else
-			GUICtrlSetState($autoDeregisterCheckbox, $GUI_CHECKED)
-		EndIf
+		_toggleCheckbox($autoDeregisterCheckbox)	
 		
 	Case $Label7
 		If GUICtrlRead($autoRegisterCheckbox) == 1 Then
@@ -288,4 +335,14 @@ Func _mainLoop()
 		
 	WEnd
 
+EndFunc
+
+Func _toggleCheckbox(ByRef $checkbox)
+	
+	If GUICtrlRead($checkbox) == 1 Then
+		GUICtrlSetState($checkbox, $GUI_UNCHECKED)
+	Else
+		GUICtrlSetState($checkbox, $GUI_CHECKED)
+	EndIf
+	
 EndFunc

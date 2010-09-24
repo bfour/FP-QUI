@@ -30,7 +30,7 @@
 		<maxRetries>
 		<retryPause>
 		<errorMode>
-			<notifier> 1
+			<QUI> 1
 			msgbox
 			stdout
 			pipe
@@ -71,10 +71,10 @@ If $errorMsg == "" Then $errorMsg = 'sending instructions via pipe to "'&$recip&
 Local $return=_pipeSend($recip, $msg, $maxRetries, $retryPause)
 
 If $return<>1 Then 
-	
+
 	Switch $errorMode
 		
-		Case "notifier"
+		Case "QUI"
 			_error($errorMsg,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,0)
 			
 		Case "msgbox"

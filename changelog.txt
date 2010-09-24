@@ -1,4 +1,50 @@
 ======
+20100924T0205
+
+ - change: FP-QUICodeGenerator will no longer create a tray icon
+
+======
+20100924T0153
+
+ - changed: FP-QUICore: reply-interface: all replies are now wrapped in <reply> tags
+
+======
+20100924T0132
+
+ - fix: FP-QUICore: wrong syntax in FP-QUIIntracom-call (errorPipe instead of errorModePipe)
+
+======
+20100924T0046
+
+ - new: FP-QUICore: added command line option <system><reinitBehaviour> ... <>"" --> reinitialize behaviour
+ - new: FP-QUICore: added command line option <system><reinitColors> ... <>"" --> reinitialize colors
+ - changed: FP-QUIConfigurationAssistant automatically reinitializes FP-QUICore, no need to restart
+
+======
+20100924T0006
+
+ - new: FP-QUICore: added command line option 34 <system><reinitDefaults> ... <>"" --> reinitialize defaults
+
+======
+20100923T2358
+
+ - change: FP-QUIFirstStartAssistant will automatically set font to Arial if on Win XP, 2003 OR 2000
+
+======
+20100923T2320
+
+ - change: code cleanup in FP-QUIConfigurationAssistant
+ - fix: FP-QUIConfigurationAssistant: removed deprecated prompt if no arguments; added show menu on first start option
+ - new: FP-QUIConfigurationAssistant prompts for restart of FP-QUICore in order for changes to take effect
+ - fix: minor bugfixes in FP-QUIConfigurationAssistant
+
+======
+20100923T2308
+
+ - change: performance optimisation: _SoundOpen, _SoundPlay, _SoundClose are used rather than SoundPlay
+ - change: code cleanup, modularisation: doAudio, doBeep, doCheckLifetime, doRun, doTalk added
+
+======
 20100920T1413
 
  - change: autoRegister-default = 0 (avoids registering on first start even if user chooses not to add reg entry)
