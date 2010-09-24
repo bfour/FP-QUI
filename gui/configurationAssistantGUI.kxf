@@ -602,7 +602,7 @@
 				<property name="Top" vt="Int16">288</property>
 				<property name="Width" vt="Int8">115</property>
 				<property name="Height" vt="Int8">49</property>
-				<property name="Caption" vt="String">Reset all to Default</property>
+				<property name="Caption" vt="String">Reset all to initial value</property>
 				<property name="TabOrder" vt="Int8">2</property>
 				<property name="Color" vt="Ident">clBtnFace</property>
 				<property name="CtrlStyle" vt="Int32">1342267392</property>

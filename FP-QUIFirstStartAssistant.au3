@@ -55,7 +55,7 @@ Func _initialize()
 	; auto optimize font selection
 	If @OSVersion == "WIN_2003" OR @OSVersion == "WIN_XP" OR @OSVersion == "WIN_2000" Then 
 		
-		_setConfiguration("defaults", "font", "Arial")
+		_setConfiguration("defaults", "font", "Microsoft Sans Serif")
 		Local $return = _fpqui("<system><reinitDefaults>1</reinitDefaults></system>", Default, 0, _ 
 				"<coreNotRunning>return</coreNotRunning><requestFailed>return</requestFailed>"& _ 
 				"<sendMaxRetries>8</sendMaxRetries><sendRetryPause>100</sendRetryPause>"& _ 
@@ -63,7 +63,7 @@ Func _initialize()
 				Default, Default)
 		
 		; we're awaiting no response --> errCode 4
-		If @error<>4 Then _error('Segoe UI does not seem to be installed. Falling back to Arial. Please restart FP-QUICore.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+		If @error<>4 Then _error('Segoe UI does not seem to be installed. Falling back to Microsoft Sans Serif. Please restart FP-QUICore.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
 			
 	EndIf
 

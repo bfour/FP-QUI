@@ -451,7 +451,8 @@ _debug("process request/update winhandle specified/end")
 		If _pipeSend($replyPipe,$reply,0) <> 1 Then
 			
 			;if that doesn't work, delegate this task to another process (this one shall not be interrupted)
-			Local $return=_runEx(@ScriptDir&"\FP-QUIIntracom.exe <recip>"&$replyPipe&"</recip><msg>"&$reply&"</msg><errorMode>pipe</errorMode><errorModePipe>FP-QUI</errorModePipe><errorMsg><text>FP-QUIIntracom failed to handle a pipe transaction: $replyPipe="&$replyPipe&"; $reply="&$reply&"</text><ico>"&@ScriptDir&"\icon.ico</ico></errorMsg><retryPause>1000</retryPause><maxRetries>20</maxRetries>")
+;~ 			Local $return=_runEx(@ScriptDir&"\FP-QUIIntracom.exe <recip>"&$replyPipe&"</recip><msg>"&$reply&"</msg><errorMode>pipe</errorMode><errorModePipe>FP-QUI</errorModePipe><errorMsg><text>FP-QUIIntracom failed to handle a pipe transaction: $replyPipe="&$replyPipe&"; $reply="&$reply&"</text><ico>"&@ScriptDir&"\icon.ico</ico></errorMsg><retryPause>1000</retryPause><maxRetries>20</maxRetries>")
+			Local $return=_runEx(@ScriptDir&"\FP-QUIIntracom.exe <recip>"&$replyPipe&"</recip><msg>"&$reply&"</msg><errorMode>log</errorMode><errorMsg>FP-QUIIntracom failed to handle a pipe transaction: $replyPipe="&$replyPipe&"; $reply="&$reply&"</errorMsg><retryPause>1000</retryPause><maxRetries>20</maxRetries>")
 			
 		EndIf
 		

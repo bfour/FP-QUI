@@ -14,7 +14,6 @@
 		<property name="Font.Style" vt="Set"/>
 		<property name="OldCreateOrder" vt="False">False</property>
 		<property name="Position" vt="Ident">poDesktopCenter</property>
-		<property name="Visible" vt="True">True</property>
 		<property name="Style" vt="Int32">-1798701056</property>
 		<property name="ExStyle" vt="Int16">256</property>
 		<property name="Version" vt="String">1.03</property>
@@ -285,9 +284,9 @@
 					<properties>
 						<property name="Left" vt="Int8">8</property>
 						<property name="Top" vt="Int16">184</property>
-						<property name="Width" vt="Int8">85</property>
+						<property name="Width" vt="Int8">43</property>
 						<property name="Height" vt="Int8">20</property>
-						<property name="Caption" vt="String">Default height</property>
+						<property name="Caption" vt="String">Height</property>
 						<property name="TabOrder" vt="Int8">3</property>
 						<property name="HaveVariable" vt="False">False</property>
 						<property name="CtrlStyle" vt="Int32">1342178048</property>

@@ -1,4 +1,16 @@
 ======
+20100924T0332
+
+ - change: FP-QUIConfigurationAssistant: set Arial as default font if OS = Win XP or 2003 or 2000
+ - fix: QUIConfigurationAssistant: minor bugs
+
+======
+20100924T0218
+
+ - new: FP-QUIIntracom: error mode "log"
+ - changed: FP-QUICore requests "log" error mode from FP-QUIIntracom
+
+======
 20100924T0205
 
  - change: FP-QUICodeGenerator will no longer create a tray icon

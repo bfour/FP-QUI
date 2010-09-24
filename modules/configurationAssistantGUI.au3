@@ -11,7 +11,7 @@ Global $configurationAssistantGUI = GUICreate("FP-QUIConfigurationAssistant", 85
 GUISetBkColor(0xFFFFFF)
 Global $cancelButton = GUICtrlCreateButton("Cancel", 616, 288, 115, 49, $BS_DEFPUSHBUTTON)
 Global $saveButton = GUICtrlCreateButton("Save", 736, 288, 115, 49, 0)
-Global $resetAllButton = GUICtrlCreateButton("Reset all to Default", 376, 288, 115, 49, $BS_MULTILINE)
+Global $resetAllButton = GUICtrlCreateButton("Reset all to initial value", 376, 288, 115, 49, $BS_MULTILINE)
 Global $helpButton = GUICtrlCreateButton("Help", 496, 288, 115, 49, 0)
 Global $Group1 = GUICtrlCreateGroup("Configuration", 8, 8, 561, 97)
 Global $configPathCombo = GUICtrlCreateCombo("", 16, 72, 385, 25)
