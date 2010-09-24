@@ -294,7 +294,11 @@ Func _mainLoop()
 	Case $fontPropertiesDefaultButton
 		
 		If @OSVersion == "WIN_2003" OR @OSVersion == "WIN_XP" OR @OSVersion == "WIN_2000" Then 
+<<<<<<< HEAD
 			GUICtrlSetData($fontInput, "Microsoft Sans Serif")
+=======
+			GUICtrlSetData($fontInput, "Arial")
+>>>>>>> remotes/TUWien/master
 		Else
 			GUICtrlSetData($fontInput, "Segoe UI")
 		EndIf
