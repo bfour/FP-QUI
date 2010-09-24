@@ -1,4 +1,9 @@
 ======
+20100924T0412
+
+ - change: configurationAssistantGUI
+
+======
 20100924T0408
 
  - fix: FP-QUIConfigurationAssistant: loading wrong checkbox-settings on init
