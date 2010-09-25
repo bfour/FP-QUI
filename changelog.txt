@@ -1,4 +1,9 @@
 ======
+20100925T0411
+
+ - fix: critical: FP-QUICore crashes because of wrong array index, range exceeded
+
+======
 20100924T0412
 
  - change: configurationAssistantGUI

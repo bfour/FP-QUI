@@ -1251,7 +1251,7 @@ Func _processNotificationsDeleteRequests()
 			GUIDelete($deleteRequest[$i])
 			
 			; close sound handle (if there's none this will simply fail)
-			_SoundClose($notificationsOptionsData[$i][21])
+			_SoundClose($notificationsOptionsData[$ID][21])
 ;~ 			If @error Then _error('failed to close sound, @error='&@error, 0, 0, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
 
 			;delete entries as specified
