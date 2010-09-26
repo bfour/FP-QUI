@@ -1,4 +1,9 @@
 ======
+20100926T0310
+
+ - change: working set will no longer be emptied, makes no sense
+
+======
 20100925T0411
 
  - fix: critical: FP-QUICore crashes because of wrong array index, range exceeded

@@ -186,7 +186,7 @@ Opt("GUIOnEventMode",1)
 Global $debug = 1
 Global $debugTimer = TimerInit()
 Func _debug($string)
-;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
+	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
 EndFunc
 
 _start()
@@ -243,7 +243,7 @@ Func _start()
 		_generateDispatcherWindow()
 		_trayMainMenu()
 		
-		DllCall("psapi.dll","int","EmptyWorkingSet","long",-1) ;reduce memory consumption
+;~ 		DllCall("psapi.dll","int","EmptyWorkingSet","long",-1) ;reduce memory consumption
 		
 		If $behaviourShowMenuOnFirstStart==1 Then _mainMenu()
 		If $CmdLineRaw<>"" Then _processRequest($CmdLineRaw)	
@@ -307,7 +307,7 @@ EndFunc
 
 Func _processRequest($requestString)
 
-_debug("process request")
+_debug("process request: "&$requestString)
 
 	Local $options=_commandLineInterpreter($requestString,$cmdLineDescriptorRequest)
 
