@@ -265,20 +265,27 @@ Func _main()
 
 	While 1
 		
+		; <retrieve>
+;~ 		_debug("########### main loop")
 		Sleep(2)
-		
 		$loadBounceCounter += 1
-		
 		Local $request=_pipeReceive("FP-QUI",0)
 		If $request<>"" Then _processRequest($request)
+		If $loadBounceCounter < 5 And $request <> "" Then 
+;~ 			_debug("~~~~~~~ bounce")
+			ContinueLoop
+		EndIf
+			
+		; </retrieve>
 		
-		If $loadBounceCounter < 10 And $request<>"" Then ContinueLoop
+		; <process>
+		
+		$loadBounceCounter = 0
 
 		For $i=1 To UBound($notificationsHandles)-1
 			_doCheckLifetime($i) ; delay, until etc.
 			_doRun($i)
 			_doAudio($i)
-;~ 			MsgBox(1,"did audio for "&$i, @error&@LF&@extended)
 			_doBeep($i)
 			_doTalk($i)
 		Next
@@ -286,19 +293,21 @@ Func _main()
 		_processNotificationsDeleteRequests()
 		
 		;adjust loopPause, based on request and existing notifications
-		If UBound($notificationsHandles)<=1 And $request=="" Then 
-			$loopPause=800
-		ElseIf UBound($notificationsHandles)<=3 And $request=="" Then 
-			$loopPause=500
-		ElseIf UBound($notificationsHandles)>3 And $request=="" Then
-			$loopPause=400
+		If UBound($notificationsHandles)<=2 And $request=="" Then 
+			$loopPause=100
+		ElseIf UBound($notificationsHandles)<=4 And $request=="" Then 
+			$loopPause=80
+		ElseIf UBound($notificationsHandles)>4 And $request=="" Then
+			$loopPause=60
 		Else	
 			$loopPause=1
 		EndIf
 		
-		For $i=0 To $loopPause Step 200
+		For $i=0 To $loopPause Step 20
 			Sleep(50)
 		Next
+		
+		; </process>
 		
 	WEnd
 	
