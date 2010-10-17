@@ -132,6 +132,10 @@
 	<reinitBehaviour> 	... <>"" --> reinitialize behaviour
 	<reinitColors> 		... <>"" --> reinitialize colors
 	
+35 <noReposAfterHide>
+   if <>"" -> inhibit reposition after this QUI has been hidden (by any event)
+   increases performance and should be used if it is certain that other deletes will follow this one
+	
 	example: <update><winHandle>0x000000</winHandle><text>hello :-)</text></update> will change the text of 0x000000, but will leave all other attributes unchanged
  
 #ce ----------------------------------------------------------------------------
@@ -186,7 +190,7 @@ Opt("GUIOnEventMode",1)
 Global $debug = 1
 Global $debugTimer = TimerInit()
 Func _debug($string)
-	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
+;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
 EndFunc
 
 _start()
@@ -260,8 +264,9 @@ Func _main()
 
 	_debug("main")
 
-	Local $loopPause=400
-	Local $loadBounceCounter = 0
+	Local $loopPause 			= 400
+	Local $loadBounceCounter 	= 0
+	Local $request 				= ""
 
 	While 1
 		
@@ -269,7 +274,8 @@ Func _main()
 ;~ 		_debug("########### main loop")
 		Sleep(2)
 		$loadBounceCounter += 1
-		Local $request=_pipeReceive("FP-QUI",0)
+		$request=_pipeReceive("FP-QUI",0)
+		If $request=="" Then $request=_pipeReceive("FP-QUI",0) ; TODO fix: *every second recv returns "" regardless of stuff being in the queue
 		If $request<>"" Then _processRequest($request)
 		If $loadBounceCounter < 5 And $request <> "" Then 
 ;~ 			_debug("~~~~~~~ bounce")
@@ -282,7 +288,7 @@ Func _main()
 		
 		$loadBounceCounter = 0
 
-		For $i=1 To UBound($notificationsHandles)-1
+		For $i=UBound($notificationsHandles)-1 To 1 Step -1
 			_doCheckLifetime($i) ; delay, until etc.
 			_doRun($i)
 			_doAudio($i)
@@ -1171,12 +1177,14 @@ _debug("spec func end")
 		;force redraw (hotfix)
 		_WinAPI_RedrawWindow($notificationsHandles[$ID][0])
 		
-		
+_debug("redraw fix end")		
 		
 		;store new options to options-array
 		For $i=0 To UBound($options)-1
 			$notificationsOptions[$ID][$i]=$options[$i][1]
 		Next		
+
+_debug("store opt end")
 
 	EndIf
 	
@@ -1227,7 +1235,7 @@ Func _hideNotification($ID)
 	EndIf
 
 _debug("start repos all")
-	_repositionAll()
+	If $notificationsOptions[$ID][35]=="" Then _repositionAll()
 _debug("end repos all")
 
 EndFunc

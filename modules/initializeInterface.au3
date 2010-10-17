@@ -24,7 +24,7 @@
 
 Func _initializeInterface()
 	
-	Global $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system"
+	Global $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system;noReposAfterHide"
 	Global $numberOfOptions=UBound(StringSplit($cmdLineDescriptorRequest,";",3))
 	
 	Global $numberOfHandles=6
