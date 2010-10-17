@@ -190,7 +190,7 @@ Opt("GUIOnEventMode",1)
 Global $debug = 1
 Global $debugTimer = TimerInit()
 Func _debug($string)
-;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
+	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
 EndFunc
 
 _start()
@@ -329,7 +329,8 @@ _debug("process request: "&$requestString)
 _debug("process request/options parse end")
 
 	;replaceVar
-	$options=_replaceVar($options)
+;~ 	$options=_replaceVar($options)
+	_replaceVar($options) ; by ref!
 
 _debug("process request/options replace var end")
 
@@ -523,8 +524,8 @@ EndFunc
 Func _GUIClick($type,$winHandle)
 
 _debug("GUIClick: $type="&$type&" $winHandle="&$winHandle)
-_debug("notif handles array ubound="&UBound($notificationsHandles))
-_debug("notif options array ubound="&UBound($notificationsOptions))
+;~ _debug("notif handles array ubound="&UBound($notificationsHandles))
+;~ _debug("notif options array ubound="&UBound($notificationsOptions))
 
 	Local $mousePos=GUIGetCursorInfo($winHandle)
 	Local $ID=_handleToID($winHandle)
@@ -665,6 +666,9 @@ _debug("start update func")
 	EndIf
 	
 	Local $ID=_handleToID($winHandle)
+	
+	; replace myHandle
+	_replaceMyHandle($options, $winHandle) ; by ref!
 	
 	If $ID<>0 Then ;else invalid handle --> invalid ID
 

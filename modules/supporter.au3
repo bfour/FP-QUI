@@ -58,7 +58,7 @@ EndFunc
 ;in: 	options (signature)
 ;out: 	is unique: -1
 ;		double found: ID of that notif
-Func _notifGetDouble($options)
+Func _notifGetDouble(ByRef $options)
 
 	Local $optionsString=""
 	Local $cmdLineDescriptorRequestArray=StringSplit($cmdLineDescriptorRequest,";",3)
@@ -114,7 +114,7 @@ Func _runEx($cmd)
 
 EndFunc
 
-Func _replaceVar($options)
+Func _replaceVar(ByRef $options)
 	
 	If $options[21][1]<>"0" Then
 		For $i=0 To UBound($options)-1
@@ -123,6 +123,14 @@ Func _replaceVar($options)
 		Next
 	EndIf
 	
-	Return $options
+EndFunc
+
+Func _replaceMyHandle(ByRef $options, $myHandle)
+	
+	If $options[21][1]=="0" Then Return
+		
+	For $i=0 To UBound($options)-1
+		$options[$i][1] = StringReplace($options[$i][1],"%myHandle%",$myHandle)
+	Next
 	
 EndFunc

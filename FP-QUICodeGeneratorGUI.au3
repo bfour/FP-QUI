@@ -25,6 +25,8 @@
 #Include <Misc.au3>
 #Include <GuiComboBox.au3>
 #Include <GuiListView.au3>
+#Include <GuiEdit.au3>
+
 
 #include <_XMLDomWrapper.au3>
 #include <_fpqui.au3>
@@ -85,12 +87,20 @@ Func _mainLoop()
 			_fpquiDelete($notifHandle)
 			
 		Case $previewButton
+			$code = _GUICtrlEdit_GetText($codeEdit)
 			If $code<>"" Then 
 				$notifHandle = _fpqui($code, $notifHandle)
 			Else
 				_setStatus("There is no code yet. I cannot create a QUI.", "", "yellow")
 			EndIf
 			
+		Case $codeEdit
+			$code = _GUICtrlEdit_GetText($codeEdit)
+			If $code<>"" Then 
+				$notifHandle = _fpqui($code, $notifHandle)
+			Else
+				_setStatus("There is no code yet. I cannot create a QUI.", "", "yellow")
+			EndIf			
 
 ; ===============
 ; === VISUALS ===
