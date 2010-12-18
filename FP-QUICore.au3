@@ -187,7 +187,7 @@
 
 Opt("GUIOnEventMode",1)
 
-Global $debug = 1
+Global $debug = 0
 Global $debugTimer = TimerInit()
 Func _debug($string)
 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)

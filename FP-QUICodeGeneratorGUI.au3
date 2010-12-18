@@ -48,7 +48,7 @@ Global $buttonFontBuffer = ""
 Global $statusTimer
 _setStatus()
 Global $debugTimer = TimerInit()
-Global $debug = 1
+Global $debug = 0
 
 _fpquiUpdate("<delay>1000</delay>", $notifHandle)
 
@@ -955,8 +955,10 @@ EndFunc
 
 Func _getCodeString()
 	
-	_XMLSaveDoc(@scriptdir&"\test.xml")
-	Local $data = FileRead(@scriptdir&"\test.xml")
+	Local $path = @scriptdir&"\QUICode.xml"
+	
+	_XMLSaveDoc($path)
+	Local $data = FileRead($path)
 	$data = StringReplace($data,"<xml>","")
 	$data = StringReplace($data,"</xml>","")
 	$data = StringReplace($data,@CRLF,"")

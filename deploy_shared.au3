@@ -2,7 +2,7 @@
 #include <_run.au3>
 #include <_path.au3>
 
-Global Const $7zPath = _stringReplaceVariables("%sabox%\global\7zip\App\7-Zip\7z.exe")
+Global Const $7zPath = _stringReplaceVariables("%sabox%\superglobal\7zip\App\7-Zip\7z.exe")
 
 Global Const $includesPath = _stringReplaceVariables("%grid%\FP-AutoItDevGrid\tools\AutoIt\Include")
 Global Const $appPath = @ScriptDir
@@ -47,9 +47,9 @@ Func _setDefaultConfig($path)
 	IniWrite($path,"_ini","specificPath","")
 	IniWrite($path,"_ini","iniSyncInteractive",0)
 
-	IniWrite($path,"defaults","font","Segoe UI")
-	IniWrite($path,"defaults","fontSize",18)
-	IniWrite($path,"defaults","iconAviSize",48)
+	IniWrite($path,"defaults","font","Microsoft Sans Serif")
+	IniWrite($path,"defaults","fontSize",12)
+	IniWrite($path,"defaults","iconAviSize",32)
 	
 ;~ 	IniWrite($path,"behaviour","promptIfNoArguments",0) ;deprecated
 	IniWrite($path,"behaviour","fadeOut",1)

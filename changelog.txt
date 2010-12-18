@@ -1,4 +1,9 @@
 ======
+20101218T1416
+
+ - changed: default height and iconAviSize
+
+======
 20100926T0310
 
  - change: working set will no longer be emptied, makes no sense
