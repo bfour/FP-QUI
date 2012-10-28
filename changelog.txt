@@ -1,4 +1,16 @@
 ======
+20121028T0230
+
+ - fixed: wrong positioning if task bar on the side
+ - fixed: rare crash on positioning of notification
+ - changed: disabled logging by default
+ 
+======
+20101218T1451
+
+ - changed: set debug mode to false in FP-QUICore and FP-QUICodeGeneratorGUI
+
+======
 20101218T1416
 
  - changed: default height and iconAviSize
