@@ -27,11 +27,11 @@
 
 Func _executeCommand($cmd)
 	
-_debug("execute commd "&$cmd)	
+;~ _debug("execute commd "&$cmd)	
 
 	;shell open if wrapped in <shellOpen></shellOpen>
 	If StringRegExp($cmd,"<shellOpen>.*</shellOpen>") Then
-_debug("shellopen")		
+;~ _debug("shellopen")		
 		
 		$cmd=_commandLineInterpreter($cmd,"shellOpen")
 		$cmd=$cmd[0][1]
@@ -45,9 +45,9 @@ _debug("shellopen")
 	
 	ElseIf StringRegExp($cmd,"<internal>.*</internal>") Then
 	
-_debug("start commndline interp")		
+;~ _debug("start commndline interp")		
 		$cmd=_commandLineInterpreter($cmd,"internal")
-_debug("end commdline interp")		
+;~ _debug("end commdline interp")		
 		
 		$cmd=$cmd[0][1]
 		Local $return = _processRequest($cmd)
@@ -60,9 +60,9 @@ _debug("end commdline interp")
 	
 	Else
 	
-_debug("run")	
+;~ _debug("run")	
 		Local $return = _runEx($cmd)
-_debug("returned from _run")	
+;~ _debug("returned from _run")	
 		Local $error = @error
 				
 		SetError($error)
