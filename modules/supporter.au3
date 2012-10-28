@@ -22,6 +22,8 @@
 
 #include-once
 
+#include <_run.au3>
+
 ;searches for handle in $notificationsHandles, returns first array-index
 ;returns "" if handle not found
 Func _handleToID($handle)
@@ -109,7 +111,7 @@ EndFunc
 
 Func _runEx($cmd)
 	
-	Run($cmd)
+	Run($cmd, "", @SW_HIDE)
 	If @error<>0 Then _error('executing "'&$cmd&'" failed',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 
 EndFunc
