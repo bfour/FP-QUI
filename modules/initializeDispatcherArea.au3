@@ -103,7 +103,7 @@ Func _getDispatcherArea()
 			$taskbarLocation="left"
 		Else
 			$taskbarLocation="right"
-		EndIf	
+		EndIf
 	EndIf
 	
 
