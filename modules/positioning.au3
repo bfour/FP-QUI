@@ -192,6 +192,10 @@ Func _setOptimalPos($ID)
 		
 		Local $winHandle=$notificationsHandles[$ID][0]
 		Local $currentPos=WinGetPos($winHandle)
+		If UBound($currentPos)<4 Then 
+			SetError(1)
+			Return ""
+		EndIf
 		Local $optimalPos=_getOptimalPos($currentPos[0],$currentPos[1],$currentPos[2],$currentPos[3],$ID)
 
 ;~ 		Local $distance=Sqrt(($currentPos[0]-$optimalPos[0])^2 + ($currentPos[1]-$optimalPos[1])^2)
@@ -217,11 +221,11 @@ Func _getOptimalPos($currentX,$currentY,$currentWidth,$currentHeight,$ID)
 	Else
 		
 		If StringInStr($startPos,"left")<>0 Then
-			$optimalX=0
+			$optimalX=$dispatcherArea[0]
 		ElseIf StringInStr($startPos,"right")<>0 Then
-			$optimalX=$dispatcherArea[2]-$currentWidth
+			$optimalX=($dispatcherArea[2]-$currentWidth)+$dispatcherArea[0]
 		Else
-			$currentX=($dispatcherArea[2]-$currentWidth)/2 ;middle
+			$currentX=(($dispatcherArea[2]-$currentWidth)/2)+$dispatcherArea[0] ;middle
 		EndIf
 		
 	EndIf
