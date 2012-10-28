@@ -27,7 +27,7 @@ Func _initializeErrorHandling()
 	;error handling
 	Global $errorInteractive=0
 	Global $errorBroadcast=0
-	Global $errorLog=1
+	Global $errorLog=0
 	Global $errorLogDir=@ScriptDir&"\data\log"
 	Global $errorLogFile=Default
 	Global $errorLogMaxNumberOfLines=Default
