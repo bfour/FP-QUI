@@ -38,7 +38,7 @@ Func _doAudio($i)
 				
 				If $IDAvailable <> 1 Or $oldPath <> $path Then
 					_SoundClose($soundID)
-					$soundID = _SoundOpen($path, $notificationsHandles[$i][0]) ; open sound and assing winhandle as alias
+					$soundID = _SoundOpen($path) ; open sound and assing winhandle as alias
 					If @error Then 
 						_error('failed to open sound: @error='&@error&'; @extended='&@extended, $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
 						Return(SetError(@error, @extended, ""))
