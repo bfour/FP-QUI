@@ -512,7 +512,6 @@ Func _processGenerateNotificationRequest($requestString,$options)
 
 EndFunc
 
-
 Func _GUIPrimaryUpClick()
 	_GUIClick("primaryUp",@GUI_WinHandle)
 EndFunc
@@ -603,7 +602,7 @@ Func _generateDispatcherWindow()
 	;dummy button, used for determining needed width
 	Global $dummyButton=GUICtrlCreateButton("",0,0,0,0)
 	
-;~ WinSetTrans($dispatcherWindow,"",100)
+;~ WinSetTrans($dispatcherWindow,"",200)
 ;~ GUISetState()
 
 EndFunc
@@ -648,7 +647,6 @@ Func _generateNotification()
 	;save GUI handle
 	$notificationsHandles[$ID][0]=$winHandle
 	
-
 	Return $ID
 	
 EndFunc
