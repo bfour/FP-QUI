@@ -42,6 +42,9 @@ EndFunc
 
 #NoTrayIcon
 
+; disable config-init for performance reasons
+Global $_configInit = False
+
 #Include <Misc.au3>
 #Include <NamedPipes.au3>
 
