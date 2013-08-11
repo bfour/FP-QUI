@@ -20,6 +20,10 @@
 	
 #ce
 
+#include-once
+
+#include <_config.au3>
+
 Func _initializeBehaviour()
 	
 ;~ 	Global $behaviourPromptIfNoArguments 	= _iniRead($GlobalConfigPath, "behaviour", "promptIfNoArguments", 1)

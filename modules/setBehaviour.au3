@@ -20,6 +20,10 @@
 	
 #ce
 
+#include-once
+
+#include <_config.au3>
+
 Func _setBehaviour($key, $value)
 	
 	_iniWrite($globalConfigPath,"behaviour",$key,$value)

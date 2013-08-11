@@ -35,12 +35,10 @@
 #CE
 
 Global $debug = 1
-Global $debugTimer = TimerInit()
+;~ Global $debugTimer = TimerInit()
 Func _debug($string)
 ;~ 	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
 EndFunc
-
-;~ _debug("include/ start")
 
 #NoTrayIcon
 
@@ -48,24 +46,18 @@ EndFunc
 #Include <NamedPipes.au3>
 
 #include <_run.au3>
-Global $CONFIG_INIT = False
-#include <_config.au3>
 
 #include "modules\initializeErrorHandling.au3"
 #include "modules\initializeBehaviour.au3"
 #include "modules\forwardRequest.au3"
 
 #include "modules\setBehaviour.au3"
-#include "modules\argumentsPrompt.au3"
-
-;~ _debug("include/ end")
+;~ #include "modules\argumentsPrompt.au3"
 
 _initializeErrorHandling()
 _initializeBehaviour()
 
 Global $errorForceMsgBox=1
-
-;~ _debug("init/ end")
 
 ;check if maxInstances is reached
 Local $procList = ProcessList(@ScriptName)
@@ -73,8 +65,6 @@ If $procList[0][0] > $behaviourMaxInstances Then
 	_error("maximum number of instances reached: "&$procList[0][0], 0, 0, $errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 	Exit
 EndIf
-
-;~ _debug("check/ end")
 
 Local $request = $CmdLineRaw
 ;~ If $request=="" Then
@@ -89,23 +79,17 @@ Local $request = $CmdLineRaw
 ;~ EndIf
 If $request == "" Then $request = "<system><menu>1</menu></system>"
 
-;~ _debug("reqProcess/ end")
-
 ;ensure notifier is running
 If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist --> not running
 	
 	_run(@ScriptDir&"\FP-QUICore.exe")
 	If ProcessWait("FP-QUICore.exe",10)==0 Then
-		_error(@LF&@LF&"FP-QUICore.exe is not running. Please start it manually. FP-QUICore must be running in the background to be able to receive requests.",1,0,0,"","","",1)
+		_error("FP-QUICore.exe is not running. Please start it manually. FP-QUICore must be running in the background to be able to receive requests.",1,0,0,"","","",1)
 		Exit(-1)
 	EndIf
 	
 EndIf
 
-;~ _debug("ensure/ end")
-
 _forwardRequest($request)
-
-;~ _debug("fwd/ end")
 
 Exit(@error)
