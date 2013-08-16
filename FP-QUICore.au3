@@ -841,7 +841,7 @@ _debug("store options end, prepare handles start")
 		Local $aviHandle=""
 		If $avi<>"" Then 
 			If $notificationsHandles[$ID][2]=="" Then
-				$aviHandle=GUICtrlCreateAvi($avi,-1,0,0,0,0)
+				$aviHandle=GUICtrlCreateAvi($avi,0,0,0,0,0)
 				_GUICtrlAVI_Play($aviHandle)
 			Else
 				$aviHandle=$notificationsHandles[$ID][2]
