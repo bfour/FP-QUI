@@ -189,8 +189,13 @@ Opt("GUIOnEventMode",1)
 
 Global $debug = 0
 Global $debugTimer = TimerInit()
+Global $debugTimerMemory = $debugTimer
 Func _debug($string)
-	If $debug==1 Then ConsoleWrite(TimerDiff($debugTimer)&" - "&$string&@LF)
+	If $debug==1 Then 
+	   Local $diff = TimerDiff($debugTimer)
+	   ConsoleWrite(Round($diff,2)&" - "&Round($diff-$debugTimerMemory,2)&" - "&$string&@LF)
+	   $debugTimerMemory = $diff
+    EndIf
 EndFunc
 
 _start()
@@ -322,21 +327,21 @@ EndFunc
 
 Func _processRequest($requestString)
 
-_debug("process request: "&$requestString)
+;~ _debug("process request: "&$requestString)
 
 	Local $options=_commandLineInterpreter($requestString,$cmdLineDescriptorRequest)
 
-_debug("process request/options parse end")
+;~ _debug("process request/options parse end")
 
 	;replaceVar
 ;~ 	$options=_replaceVar($options)
 	_replaceVar($options) ; by ref!
 
-_debug("process request/options replace var end")
+;~ _debug("process request/options replace var end")
 
 	;check requestString
 	Local $requestArray=_commandLineInterpreter($requestString)
-_debug("process request/requestArray build end")
+;~ _debug("process request/requestArray build end")
 	Local $validDescriptors=StringSplit($cmdLineDescriptorRequest,";",3)
 	Local $valid=0
 	Local $invalidDescriptors=""
@@ -358,7 +363,7 @@ _debug("process request/requestArray build end")
 
 	If $invalidDescriptors<>"" Then _error("invalid descriptor(s): "&$invalidDescriptors,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 
-_debug("process request/descriptor validation end")
+;~ _debug("process request/descriptor validation end")
 
 	;go
 	Local $reply=""
@@ -410,7 +415,7 @@ _debug("process request/descriptor validation end")
 		
 	ElseIf $options[26][1]<>"" Then ;winHandle<>"" --> update notif
 		
-_debug("process request/update winhandle specified/start")
+;~ _debug("process request/update winhandle specified/start")
 
 		;if this notification is visible (and exists) simply do an update
 		If _notificationVisible($options[26][1])==1 Then
@@ -422,7 +427,7 @@ _debug("process request/update winhandle specified/start")
 			$reply=$notificationsHandles[$return[0]][0] ;return[0] ... ID
 		EndIf
 		
-_debug("process request/update winhandle specified/end")
+;~ _debug("process request/update winhandle specified/end")
 	
 	ElseIf $options[34][1]<>"" Then ; system
 
@@ -490,7 +495,7 @@ Func _processGenerateNotificationRequest($requestString,$options)
 	Local $ID=-1
 	
 	If $noDouble<>"" Then $ID=_notifGetDouble($options)
-	_debug("process request/generate/_notifGetDouble end")
+;~ _debug("process request/generate/_notifGetDouble end")
 	
 	;if no need for not-double or no double found
 	If $noDouble=="" Or $ID==-1 Then
@@ -507,7 +512,7 @@ Func _processGenerateNotificationRequest($requestString,$options)
 
 	$returnArray[0] = $ID
 	
-	_debug("process request/generate/generate end, result: $returnArray[0]="&$returnArray[0]&", $returnArray[1]="&$returnArray[1])
+;~ _debug("process request/generate/generate end, result: $returnArray[0]="&$returnArray[0]&", $returnArray[1]="&$returnArray[1])
 	Return $returnArray
 
 EndFunc
@@ -522,7 +527,7 @@ EndFunc
 
 Func _GUIClick($type,$winHandle)
 
-_debug("GUIClick: $type="&$type&" $winHandle="&$winHandle)
+;~ _debug("GUIClick: $type="&$type&" $winHandle="&$winHandle)
 ;~ _debug("notif handles array ubound="&UBound($notificationsHandles))
 ;~ _debug("notif options array ubound="&UBound($notificationsOptions))
 
@@ -1230,15 +1235,14 @@ Func _hideNotification($ID)
 		;hide GUI (it still exists, until the delete request has been processed)
 		GUISetState(@SW_HIDE,$winHandle)
 
+;~ 	    If $notificationsOptions[$ID][35]=="" Then _reflow($ID)
+If $notificationsOptions[$ID][35]=="" Then _repositionAll()
+
 		;add a delete request
 		ReDim $notificationsDeleteRequests[UBound($notificationsDeleteRequests)+1]
 		$notificationsDeleteRequests[UBound($notificationsDeleteRequests)-1]=$winHandle
 		
 	EndIf
-
-_debug("start repos all")
-	If $notificationsOptions[$ID][35]=="" Then _repositionAll()
-_debug("end repos all")
 
 EndFunc
 
@@ -1255,9 +1259,8 @@ EndFunc
 
 Func _processNotificationsDeleteRequests()
 	
-	;Make a copy of this array. All requests that are added during this func executes are ignored. This avoids outOfBounds-Errors
+	; Make a copy of this array. All requests that are added while this func executes are ignored. This avoids outOfBounds-Errors.
 	Local $deleteRequest=$notificationsDeleteRequests
-	
 	
 	For $i=1 To UBound($deleteRequest)-1
 		
@@ -1266,20 +1269,19 @@ Func _processNotificationsDeleteRequests()
 
 		If $ID <> "" Then
 
-			; delte GUI
+			; delete GUI
 			GUIDelete($deleteRequest[$i])
 			
 			; close sound handle (if there's none this will simply fail)
 			_SoundClose($notificationsOptionsData[$ID][21])
 ;~ 			If @error Then _error('failed to close sound, @error='&@error, 0, 0, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
 
-			;delete entries as specified
+			; delete entries as specified
 			_ArrayDelete($notificationsHandles,$ID)
 			_ArrayDelete($notificationsOptions,$ID)
 			_ArrayDelete($notificationsOptionsData,$ID)
 			
 		EndIf
-		
 		
 		;delete entry in notificationsDeleteRequests that has just been processed
 		Local $j=1

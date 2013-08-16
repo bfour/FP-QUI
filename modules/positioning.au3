@@ -23,7 +23,7 @@
 #include-once
 
 Func _repositionAll()
-	
+
 	For $i=1 To UBound($notificationsHandles)-1
 			
 		;set optimal size and position
@@ -34,6 +34,51 @@ Func _repositionAll()
 	
 EndFunc
 
+; reposition/reflow other notifications if an existing notification has been removed
+; $removedNotificationID ... ID of the notification that has been removed
+Func _reflow($removedNotificationID)
+
+   _debug("reflow start")
+
+   ; get position of this notification
+   Local $thisNotifGUIHandle = $notificationsHandles[$removedNotificationID][0]
+   Local $thisPos = WinGetPos($thisNotifGUIHandle)
+   Local $thisY = $thisPos[1]
+   Local $thisHeight = $thisPos[3]
+   
+   ; get positions of other (explicitly exclude this) visible notifications
+   _debug("reflow getvis start")
+   Local $otherNotifications = _getVisibleNotificationsPos($thisNotifGUIHandle)
+   _debug("reflow getvis end")
+   
+   ; if notifications are shown bottom up (up), move all notifs above the deleted one down by the height of the deleted one
+   ; if -------   ||    ------- top down (down), move all notifs below the deleted one up by the height of the delted one
+   
+   For $i = 0 To UBound($otherNotifications)-1
+   
+	  Local $y = $otherNotifications[$i][1]
+	  
+	  If StringInStr($direction, "up")<>0 Then
+		 If $y < $thisY Then 
+			Local $newX = $otherNotifications[$i][0]
+			Local $newY = $otherNotifications[$i][1] + $thisHeight + 1
+			Local $newWidht = $otherNotifications[$i][2]
+			Local $newHeight = $otherNotifications[$i][3]
+			_setPosByHandle($otherNotifications[$i][4], $newX, $newY, Default, Default)
+		 EndIf
+	  ElseIf StringInStr($direction, "down")<>0 Then
+		 If $y > $thisY Then 
+			Local $newX = $otherNotifications[$i][0]
+			Local $newY = $otherNotifications[$i][1] - $thisHeight
+			_setPosByHandle($otherNotifications[$i][4], $newX, $newY, Default, Default)
+		 EndIf		 
+	  EndIf
+	  
+   Next
+   
+   _debug("reflow end")
+   
+EndFunc
 
 Func _setSize($ID, $width, $height)
 
@@ -41,7 +86,7 @@ Func _setSize($ID, $width, $height)
 	Local $currentSize=WinGetPos($winHandle)	
 
 	If $width<>$currentSize[2] Or $height<>$currentSize[3] Then
-		WinMove($winHandle,"",$currentSize[0],$currentSize[1],$width,$height)
+	   _setPos($ID, $currentSize[0], $currentSize[1], $width, $height)
 	EndIf
 
 EndFunc
@@ -62,7 +107,7 @@ Func _setOptimalSize($ID, $widthOverwrite=Default, $heightOverwrite=Default)
 		GUISetFont($optimalSize[2],Default,Default,$notificationsOptions[$ID][16],$winHandle)
 		$notificationsOptionsData[$ID][17]=$optimalSize[2]
 		
-		WinMove($winHandle,"",$currentSize[0],$currentSize[1],$optimalSize[0],$optimalSize[1])
+		_setPos($ID, $currentSize[0], $currentSize[1], $optimalSize[0], $optimalSize[1])
 		
 	EndIf
 	
@@ -198,12 +243,8 @@ Func _setOptimalPos($ID)
 		EndIf
 		Local $optimalPos=_getOptimalPos($currentPos[0],$currentPos[1],$currentPos[2],$currentPos[3],$ID)
 
-;~ 		Local $distance=Sqrt(($currentPos[0]-$optimalPos[0])^2 + ($currentPos[1]-$optimalPos[1])^2)
-		Local $speed=1
-;~ 		If $distance<200 Then $speed=2
-
 		If $optimalPos[0]<>$currentPos[0] Or $optimalPos[1]<>$currentPos[1] Then
-			WinMove($winHandle,"",$optimalPos[0],$optimalPos[1],$currentPos[2],$currentPos[3],$speed)
+			_setPos($ID, $optimalPos[0], $optimalPos[1], Default, Default)
 		EndIf
 		
 	EndIf
@@ -294,17 +335,18 @@ Func _getOptimalPos($currentX,$currentY,$currentWidth,$currentHeight,$ID)
 EndFunc
 
 
-
-
 ;return: array: 0:x 1:y 2:width 3:height 4:handle
-Func _getVisibleNotificationsPos()
+Func _getVisibleNotificationsPos($excludeGUIHandle = "")
 
 	Local $returnArray[UBound($notificationsHandles)][5]
+	Local $counter = 0
 
 	For $i=1 To UBound($notificationsHandles)-1
 		
-		Local $pos=WinGetPos($notificationsHandles[$i][0])
-		Local $visible=BitAND(WinGetState($notificationsHandles[$i][0]),2)
+		Local $GUIHandle = $notificationsHandles[$i][0]
+		If $GUIHandle == $excludeGUIHandle Then ContinueLoop
+		Local $pos=WinGetPos($GUIHandle)
+		Local $visible=BitAND(WinGetState($GUIHandle),2)
 
 		If $visible And IsArray($pos) Then 
 			$returnArray[$i][0]=$pos[0]
@@ -320,10 +362,25 @@ Func _getVisibleNotificationsPos()
 	For $i=UBound($returnArray)-1 To 0 Step -1
 		If $returnArray[$i][0]=="" Then _ArrayDelete($returnArray,$i)
 	Next
-	
+		
 	Return $returnArray
 
 EndFunc
 
+Func _setPos($ID, $x, $y, $width="", $height="")
+   
+   Local $handle = $notificationsHandles[$ID][0]
 
+   _setPosByHandle($handle, $x, $y, $width, $height)
+   
+EndFunc
 
+Func _setPosByHandle($handle, $x, $y, $width="", $height="")
+   
+;~ 		Local $distance=Sqrt(($currentPos[0]-$optimalPos[0])^2 + ($currentPos[1]-$optimalPos[1])^2)
+;~    Local $speed=1
+;~ 		If $distance<200 Then $speed=2
+
+   WinMove($handle, "", $x, $y, $width, $height)
+   
+EndFunc
