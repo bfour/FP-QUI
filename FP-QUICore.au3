@@ -149,7 +149,7 @@
 #include <GUIConstantsEx.au3>
 #Include <Misc.au3>
 
-#include <_error.au3>
+#include <_log.au3>
 #include <_commandLineInterpreter.au3>
 #include <_talk.au3>
 #include <_config.au3>
@@ -216,7 +216,7 @@ Func _start()
 		;check if maxInstances is reached
 		Local $procList = ProcessList(@ScriptName)
 		If $procList[0][0] > $behaviourMaxInstances Then
-			_error("maximum number of instances reached: "&$procList[0][0], 0, 0, $errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
+			_logError("maximum number of instances reached: "&$procList[0][0], 0, 0, $errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 			Exit
 		EndIf
 		
@@ -248,7 +248,7 @@ Func _start()
 		_initializeAll()
 		_handleFirstStart($behaviourFirstStart, $behaviourshowFirstStartGUI)
 		If $behaviourAutoRegister==1 Then _register(0, Default, Default, @ScriptName)
-		If @error<>0 Then _error("Failed to add registry entry.",0,$errorBroadCast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
+		If @error<>0 Then _logError("Failed to add registry entry.",0,$errorBroadCast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 		_generateDispatcherWindow()
 		_trayMainMenu()
 		
@@ -361,7 +361,7 @@ Func _processRequest($requestString)
 		
 	Next
 
-	If $invalidDescriptors<>"" Then _error("invalid descriptor(s): "&$invalidDescriptors,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
+	If $invalidDescriptors<>"" Then _logError("invalid descriptor(s): "&$invalidDescriptors,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 
 ;~ _debug("process request/descriptor validation end")
 
@@ -379,7 +379,7 @@ Func _processRequest($requestString)
 
 ;TODO: maybe we should return this via stdout or pipe if applicable
 		If $winHandle == "" Then 
-			_error('You did not specify a winHandle within your update request: "'&$options[32][1]&'"',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)
+			_logError('You did not specify a winHandle within your update request: "'&$options[32][1]&'"',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)
 			SetError(1)
 			Return ""
 		EndIf
@@ -1274,7 +1274,7 @@ Func _processNotificationsDeleteRequests()
 			
 			; close sound handle (if there's none this will simply fail)
 			_SoundClose($notificationsOptionsData[$ID][21])
-;~ 			If @error Then _error('failed to close sound, @error='&@error, 0, 0, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
+;~ 			If @error Then _logError('failed to close sound, @error='&@error, 0, 0, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
 
 			; delete entries as specified
 			_ArrayDelete($notificationsHandles,$ID)
@@ -1296,7 +1296,7 @@ Func _processNotificationsDeleteRequests()
 					ContinueLoop
 				;else, an error has occured, since we haven't yet deleted the entry
 				Else
-					_error('something is wrong here: could not remove delete request "'&$deleteRequest[$i]&'" from requestArray, while deleting the other array entries seems to have been successful',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogfile,$errorLogMaxNumberOfLines)
+					_logError('something is wrong here: could not remove delete request "'&$deleteRequest[$i]&'" from requestArray, while deleting the other array entries seems to have been successful',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogfile,$errorLogMaxNumberOfLines)
 				EndIf
 			EndIf
 			
@@ -1314,6 +1314,6 @@ EndFunc
 Func OnAutoItExit()
 	
 	If $behaviourAutoDeregister == 1 Then _deregister(0, 1)
-	If @error Then _error("Deregistering FP-QUI failed:"&@LF&"@error="&@error&@LF&"@extended="&@extended&@LF&"$behaviourAutoRegister="&$behaviourAutoRegister, $errorInteractive, $errorInteractive, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
+	If @error Then _logError("Deregistering FP-QUI failed:"&@LF&"@error="&@error&@LF&"@extended="&@extended&@LF&"$behaviourAutoRegister="&$behaviourAutoRegister, $errorInteractive, $errorInteractive, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
 	
 EndFunc
