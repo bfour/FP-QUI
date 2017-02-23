@@ -1,4 +1,10 @@
 ======
+20170223T2319
+
+ - adjust to desktop layout changes
+ - bugfixes
+
+======
 20121028T0230
 
  - fixed: wrong positioning if task bar on the side
