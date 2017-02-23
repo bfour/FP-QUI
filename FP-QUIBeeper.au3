@@ -15,13 +15,13 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  
+    along with this program.
 	If not, see http://www.gnu.org/licenses/gpl.html.
-	
+
 #ce
 
 #cs
-	
+
 	interface: exe <beep>freq;duration|freq;duration|...</beep>
 
 	exit codes:
@@ -45,14 +45,14 @@ $request=$request[0][1]
 Global $beeps=StringSplit($request,"|",3)
 
 For $i=0 To UBound($beeps)-1
-	
+
 	Local $beep=StringSplit($beeps[$i],";",3)
 	If UBound($beep)==2 Then
 		Beep($beep[0],$beep[1])
 	Else
 		$exitCode=1
 	EndIf
-	
+
 Next
 
 Exit($exitCode)

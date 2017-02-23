@@ -15,23 +15,23 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  
+    along with this program.
 	If not, see http://www.gnu.org/licenses/gpl.html.
 
-	
+
 	Provides an interface for FP-QUICore. Alternatively, you may use FP-QUICore itself. The syntax is exactly the same. Since FP-QUI only includes the code necessary to process an invoke and communicate with FP-QUICore it should need less resources to be executed.
-	
+
 	1.) checks if a main-instance is running, starts one if necessary
 	2.) forwards invoke to main
 	3.) delivers response
 
 #ce
 
-#CS 
+#CS
 
 	interface:
-	return values: 1 ... generic error occured, -1 ... FP-QUICore could not be started, 0 ... no error occured 
-	
+	return values: 1 ... generic error occured, -1 ... FP-QUICore could not be started, 0 ... no error occured
+
 #CE
 
 Global $debug = 1
@@ -71,26 +71,26 @@ EndIf
 
 Local $request = $CmdLineRaw
 ;~ If $request=="" Then
-;~ 	
-;~ 	If $behaviourPromptIfNoArguments==1 Then 
+;~
+;~ 	If $behaviourPromptIfNoArguments==1 Then
 ;~ 		$request=_argumentsPrompt()
 ;~ 		If $request=="" Then Exit
 ;~ 	Else
 ;~ 		Exit
 ;~ 	EndIf
-;~ 	
+;~
 ;~ EndIf
 If $request == "" Then $request = "<system><menu>1</menu></system>"
 
 ;ensure notifier is running
 If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist --> not running
-	
+
 	_run(@ScriptDir&"\FP-QUICore.exe")
 	If ProcessWait("FP-QUICore.exe",10)==0 Then
 		_error("FP-QUICore.exe is not running. Please start it manually. FP-QUICore must be running in the background to be able to receive requests.",1,0,0,"","","",1)
 		Exit(-1)
 	EndIf
-	
+
 EndIf
 
 _forwardRequest($request)
