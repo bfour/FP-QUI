@@ -1,0 +1,8 @@
+/screenshots/
+/dist/
+*.exe
+/QUICode.xml
+/installer.SED
+/test.au3
+/test.xml.old
+/docs/
