@@ -38,7 +38,6 @@
 Global $_configInit = False
 
 #Include <Misc.au3>
-#Include <NamedPipes.au3>
 
 #include <_run.au3>
 
@@ -64,15 +63,14 @@ EndIf
 Local $request = $CmdLineRaw
 If $request == "" Then $request = "<system><menu>1</menu></system>"
 
-;ensure notifier is running
-If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; pipe does not exist --> not running
-
+; check whether core is running
+If _Singleton("FP-QUICore", 1) == 0 Then
+   ; core not running -> launch it
    _run(@ScriptDir&"\FP-QUICore.exe")
    If ProcessWait("FP-QUICore.exe",10)==0 Then
       _error("FP-QUICore.exe is not running. Please start it manually. FP-QUICore must be running in the background to be able to receive requests.",1,0,0,"","","",1)
       Exit(-1)
    EndIf
-
 EndIf
 
 _forwardRequest($request)
