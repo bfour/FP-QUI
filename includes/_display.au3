@@ -1,7 +1,7 @@
 #cs
 
 	author: "SkinnyWhiteGuy" on http://www.autoitscript.com/forum/index.php?showtopic=105921
-	modified by Florian Pollak
+	modified by Florian Pollak (bfourdev@gmail.com)
 
 #ce
 

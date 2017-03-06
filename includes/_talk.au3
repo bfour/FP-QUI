@@ -1,16 +1,25 @@
-#cs ----------------------------------------------------------------------------
+#cs
 
- AutoIt Version: 3.2.12.0
- Author:	Florian Pollak
- 
-#ce ----------------------------------------------------------------------------
+   Copyright 2009-2017 Florian Pollak (bfourdev@gmail.com)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+#ce
 
 #include-once
 
 ;~ _talk('test')
 ;~ _talk('Daisy, Daisy, give me your answer do.')
-;~ MsgBox(1,"","")
-;~ Sleep(1861)
 ;~ _talkListVoices()
 
 ; language:
@@ -20,15 +29,15 @@
 ; 40c FR FR
 ; 40b FI FI
 Func _talk($string, $language=Default)
-	
+
 	If $string=="" Then
 		SetError(1)
-		Return ""		
+		Return ""
 	EndIf
-	
+
 	If $language==Default Then $language=409
-	
-    Local $speech = ObjCreate("SAPI.SpVoice")	
+
+    Local $speech = ObjCreate("SAPI.SpVoice")
 	If @error Then
 		SetError(1)
 		Return ""
@@ -45,23 +54,23 @@ Func _talk($string, $language=Default)
 EndFunc
 
 Func _talkListVoices()
-	
-	Local $speech = ObjCreate("SAPI.SpVoice")	
+
+	Local $speech = ObjCreate("SAPI.SpVoice")
 	If @error Then
 		SetError(1)
 		Return ""
 	EndIf
-	
+
 	$string = "test"
 	$voiceType = 1
-	
+
 	Local $i = 0, $voice
     Dim $voiceTypes = $speech.GetVoices('', '')
-	
+
     For $voice In $voiceTypes
-		
+
         ConsoleWrite($voiceType & ", " & $i & @LF)
-		
+
         Select
             Case $voiceType == 1 And $i == 0
                 ConsoleWrite($voice.GetDescription & @LF)
@@ -84,8 +93,8 @@ Func _talkListVoices()
                 $speech.Speak ($string)
                 ExitLoop
         EndSelect
-        $i += 1 
-		
+        $i += 1
+
     Next
-;~ 	
+;~
 EndFunc

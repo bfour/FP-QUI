@@ -1,3 +1,21 @@
+#cs
+
+   Copyright 2015-2017 Florian Pollak (bfourdev@gmail.com)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+#ce
+
 #include-once
 #include <_fpqui.au3>
 #include <_log.au3>
@@ -20,11 +38,11 @@ Func _FPUIInitialize()
 	If FileExists(@ScriptDir&"\icon.ico")==1 Then $iconPath=@ScriptDir&"\icon.ico"
 	If FileExists(@ScriptDir&"\GUI\icon.ico")==1 Then $iconPath=@ScriptDir&"\GUI\icon.ico"
 	If FileExists(@ScriptDir&"\GUI\icons\icon.ico")==1 Then $iconPath=@ScriptDir&"\GUI\icons\icon.ico"
-	
+
 	Global $_FPUIQUIDefaults = "<ico>"&$iconPath&"</ico><noDouble>1</noDouble>"
 	Global $_FPUILogLikeQUIDefaults = "<untilClick><any>1</any></untilClick><noDouble>1</noDouble>"
 	Global $_FPUIRunAsAdminCommand = @ScriptDir&"\tools\FP-RunAsAdmin.exe"
-	
+
 	Global $_FPUIOKIcon = "", $_FPUIDebugIcon = "", $_FPUIInfoIcon = "", $_FPUIWarningIcon = "", $_FPUIErrorIcon = ""
 	If FileExists(@ScriptDir&"\GUI\icons\OK.ico")==1 Then $_FPUIOKIcon=@ScriptDir&"\GUI\icons\OK.ico"
 	If FileExists(@ScriptDir&"\GUI\icons\debug.ico")==1 Then $_FPUIDebugIcon=@ScriptDir&"\GUI\icons\debug.ico"
@@ -76,7 +94,7 @@ Func _FPUINotify($message, $explicitDismissRequired = 0, $timeout = 8000, $outpu
 	If $outputMethods == Default Then
 		Return _FPUINotifyViaQUI($message, $explicitDismissRequired, $timeout, "")
 	EndIf
-	
+
 	For $i=0 To UBound($outputMethods)-1
 		Switch $outputMethods[$i][0]
 		Case "QUI"
@@ -105,7 +123,7 @@ Func _FPUINotifyViaQUI($message, $explicitDismissRequired, $timeout, $customArgs
 	Local $args = $_FPUIQUIDefaults
 	$args &= "<text>"&$message&"</text>"
 	If Not $explicitDismissRequired Then $args &= "<delay>"&$timeout&"</delay>"
-	$args &= $customArgs	
+	$args &= $customArgs
 	Return _fpqui($args)
 EndFunc
 
@@ -166,8 +184,8 @@ Func _FPUIAddMethod(ByRef $methods, $name, $opt1="", $opt2="")
 EndFunc
 
 Func _FPUIIntent($description, $command, $requireAdmin = 0)
-   
-   If $requireAdmin == 1 Then 
+
+   If $requireAdmin == 1 Then
 	  If Not FileExists($_FPUIRunAsAdminCommand) Then
 		 SetError(1)
 		 _logError('RunAsAdminCommand refers to file that does not exist. Admin rights required for intent "'&$description&'".')
@@ -175,26 +193,26 @@ Func _FPUIIntent($description, $command, $requireAdmin = 0)
 	  EndIf
 	  $command = $_FPUIRunAsAdminCommand & " " & $command
    EndIf
-   
+
    Local $args = $_FPUIQUIDefaults
    $args &= "<text>"&$description&"</text>"
    $args &= "<bkColor>gray</bkColor>"
    $args &= "<button><ID1><label>apply</label><cmd>"&$command&"</cmd></ID1></button>"
    $args &= "<untilClick><includeButton>1</includeButton><any>1</any></untilClick>"
-   
+
    Return _fpqui($args)
-   
+
 EndFunc
 
 Func _FPUITask($text, $PID = @AutoItPID, $progress = "", $extraParams = "")
-   
+
    ; lookup existing QUI via PID
    Local $QUIHandle = _FPUIQUIListLookup($_FPUIQUIList, $PID)
-   
+
    Local $args = ""
    If $text <> Default Then $args &= "<text>"&$text&"</text>"
    $args &= "<progress>"&$progress&"</progress><audio></audio><bkColor></bkColor><avi>S:\sabox\grid\data\GUI\avis\busy_indicator_32x32.avi</avi>"
-   
+
    If $QUIHandle=="" Then
 	  $args = $_FPUIQUIDefaults & $args
 	  $args &= "<untilProcessClose>"&$PID&"</untilProcessClose>"
@@ -205,15 +223,15 @@ Func _FPUITask($text, $PID = @AutoItPID, $progress = "", $extraParams = "")
 	  $args &= $extraParams
 	  $QUIHandle = _fpquiUpdate($args, $QUIHandle)
    EndIf
-   
+
    _FPUIQUIListSet($_FPUIQUIList, $PID, $QUIHandle)
    Return $QUIHandle
-   
+
 EndFunc
 
 ; show status of task and indicate the task needs attention
 Func _FPUITaskAttention($text, $PID = @AutoItPID, $progress = "", $extraParams = "")
-   Return _FPUITask($text, $PID, "", "<bkColor>orange</bkColor><avi>S:\sabox\grid\data\GUI\avis\warning_indicator_32x32.avi</avi><audio><path>S:\sabox\grid\data\audio\Star Trek\fav\alarm01.mp3</path><pause>1861</pause></audio>"&$extraParams)   
+   Return _FPUITask($text, $PID, "", "<bkColor>orange</bkColor><avi>S:\sabox\grid\data\GUI\avis\warning_indicator_32x32.avi</avi><audio><path>S:\sabox\grid\data\audio\Star Trek\fav\alarm01.mp3</path><pause>1861</pause></audio>"&$extraParams)
 EndFunc
 
 ; show status of task and indicate the task is done
@@ -224,29 +242,29 @@ EndFunc
 ; returns QUI-handle corresponding to given reference string
 ; @error 1: not found
 Func _FPUIQUIListLookup(ByRef $QUIList, $referenceString)
-   
+
    For $i = 1 To UBound($QUIList)-1
-	  If $QUIList[$i][0] == $referenceString Then Return $QUIList[$i][1]	  
+	  If $QUIList[$i][0] == $referenceString Then Return $QUIList[$i][1]
    Next
-   
+
    SetError(1)
    Return ""
-   
+
 EndFunc
 
 Func _FPUIQUIListSet(ByRef $QUIList, $referenceString, $QUIHandle)
-   
+
    ; update existing entry if exists
    For $i = 1 To UBound($QUIList)-1
-	  If $QUIList[$i][0] == $referenceString Then 
+	  If $QUIList[$i][0] == $referenceString Then
 		 $QUIList[$i][1] = $QUIHandle
 		 Return
 	  EndIf
    Next
-   
+
    ; new entry
    ReDim $QUIList[UBound($QUIList)+1][UBound($QUIList,2)]
    $QUIList[UBound($QUIList)-1][0] = $referenceString
    $QUIList[UBound($QUIList)-1][1] = $QUIHandle
-   
+
 EndFunc
