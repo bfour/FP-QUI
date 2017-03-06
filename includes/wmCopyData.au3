@@ -85,7 +85,6 @@ func wmCopyDataSend($hWnd, $sData)                                      ; Send W
                    'wparam', 0, _                                       ; wparam should be source window handle
                    'lparam', $pCOPYDATA)                                ; lparam should be COPYDATASTRUCT pointer
     if (@error) or ($Ret[0] = -1) then                                  ; Check result
-	   MsgBox(1,"","meow")
         return 0                                                        ; Notify error
     endif                                                               ;
     return $Ret[0]                                                      ; Result 1/0=success/fail sent
