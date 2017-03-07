@@ -347,21 +347,19 @@ EndFunc
 
 Func _processRequest($requestString)
 
-;~ _debug("process request: "&$requestString)
+   _debug("process request: "&$requestString)
 
    Local $options=_commandLineInterpreter($requestString,$cmdLineDescriptorRequest)
-
-;~ _debug("process request/options parse end")
+   _debug("process request: options parse end")
 
    ;replaceVar
 ;~    $options=_replaceVar($options)
    _replaceVar($options) ; by ref!
-
-;~ _debug("process request/options replace var end")
+   _debug("process request: options replace var end")
 
    ;check requestString
    Local $requestArray=_commandLineInterpreter($requestString)
-;~ _debug("process request/requestArray build end")
+   _debug("process request: requestArray build end")
    Local $validDescriptors=StringSplit($cmdLineDescriptorRequest,";",3)
    Local $valid=0
    Local $invalidDescriptors=""
@@ -383,21 +381,21 @@ Func _processRequest($requestString)
 
    If $invalidDescriptors<>"" Then _logError("invalid descriptor(s): "&$invalidDescriptors,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines)
 
-;~ _debug("process request/descriptor validation end")
+   _debug("process request: descriptor validation end")
 
    ;go
    Local $reply=""
 
    If $options[32][1]<>"" Then ;update
 
-      _debug("process request/update")
+      _debug("process request: update")
 
       ;we simply append the update without the "update" tags to the current requestString (options), to force an overwrite of the attributes to be updated
 
       $winHandle = _commandLineInterpreter($options[32][1],"winHandle")
       $winHandle = $winHandle[0][1]
 
-;TODO: maybe we should return this via stdout or wmcopydata if applicable
+;TODO: maybe we should return this error message via stdout or wmcopydata if applicable
       If $winHandle == "" Then
          _logError('You did not specify a winHandle within your update request: "'&$options[32][1]&'"',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)
          SetError(1)
@@ -421,12 +419,12 @@ Func _processRequest($requestString)
 
       _processRequest($currentRequestString & $requestString)
 
-      ;this time we do not want to send a reply (this has already be done in the function-call above if specified)
+      ;this time we do not want to send a reply (this has already been done in the function-call above if specified)
       $options[27][1]=""
 
    ElseIf $options[31][1]<>"" Then ;delete
 
-      _debug("process request/delete")
+      _debug("process request: delete")
 
       Local $ID=_handleToID($options[31][1])
       If Not @error Then _hideNotification($ID)
@@ -480,8 +478,8 @@ Func _processRequest($requestString)
 
    ; reply (even if no notif has been created because it's not unique but has to be)
    $reply = "<reply>"&$reply&"</reply>"
-   Local $replyInstructions=_commandLineInterpreter($options[27][1], "wmcopydataHandle;stdout")
-   Local $replyCDHandle = $replyInstructions[0][1]
+   Local $replyInstructions = _commandLineInterpreter($options[27][1], "wmcopydataHandle;stdout")
+   Local $replyCDHandle     = $replyInstructions[0][1]
 
       ; via wmcdhandle
    If $replyInstructions[0][1]<>"" Then
