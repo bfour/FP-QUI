@@ -215,8 +215,7 @@ Func _start()
       EndIf
 
       If $CmdLineRaw<>"" Then
-         _debug("command line is not empty")
-         _debug("attempting to forward request")
+         _debug("command line is not empty, attempting to forward request")
          _forwardRequest($CmdLineRaw)
          _debug("forwardRequest finished")
       Else
