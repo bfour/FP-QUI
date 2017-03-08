@@ -182,7 +182,7 @@
 
 Opt("GUIOnEventMode",1)
 
-Global $debug = 0
+Global $debug = 1
 Global $debugTimer = TimerInit()
 Global $debugTimerMemory = $debugTimer
 Func _debug($string)
