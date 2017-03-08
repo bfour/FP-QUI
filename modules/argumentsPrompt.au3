@@ -1,7 +1,7 @@
 #cs
 
-	FP-QUI allows you to show notifications (popups) in the tray area.
-	It can be controlled via command line or named pipes.
+   FP-QUI allows you to show notifications (popups) in the tray area.
+   It can be controlled via command line or named pipes.
     Copyright (C) 2010 Florian Pollak
 
     This program is free software: you can redistribute it and/or modify
@@ -15,9 +15,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  
-	If not, see http://www.gnu.org/licenses/gpl.html.
-	
+    along with this program.
+   If not, see http://www.gnu.org/licenses/gpl.html.
+
 #ce
 
 #include-once
@@ -31,9 +31,9 @@
 #Include <GuiEdit.au3>
 
 Func _argumentsPrompt()
-	
-	Opt("GUIOnEventMode",0)
-	
+
+   Opt("GUIOnEventMode",0)
+
 #Region ### START Koda GUI section ### Form=e:\sabox\grid\FP-QUI\gui\argumentsprompt.kxf
 $argumentsPrompt = GUICreate(@ScriptName, 549, 225, 436, 378)
 $OKButton = GUICtrlCreateButton("OK", 352, 184, 91, 33, 0)
@@ -51,70 +51,70 @@ $clearButton = GUICtrlCreateButton("clear", 168, 160, 75, 25, 0)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
-	While 1
-		
-		$nMsg = GUIGetMsg()
-		
-		Switch $nMsg
-			
-		Case $GUI_EVENT_CLOSE
-			GUISetState(@SW_HIDE,$argumentsPrompt)
-			_argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
-			Return ""
-			
-		Case $bracketButton, $closeBracketButton
-			
-			Local $index=_GUICtrlEdit_GetSel($argumentsEdit)
-			Local $prefix=""
-			
-			If $nMsg==$bracketButton Then
-				$prefix="<"				
-			Else
-				$prefix="</"
-			EndIf
-			
-			_GUICtrlEdit_InsertText($argumentsEdit, $prefix, $index[0])
-			_GUICtrlEdit_InsertText($argumentsEdit, ">", $index[1]+StringLen($prefix))
-			
-			GUICtrlSetState($argumentsEdit,$GUI_FOCUS)
-			_GUICtrlEdit_SetSel($argumentsEdit, $index[1]+StringLen($prefix)+1, $index[1]+StringLen($prefix)+1)			
-			
-		Case $clearButton
-			_GUICtrlEdit_SetText($argumentsEdit,"")		
-			
-		Case $combo
-			Local $index=_GUICtrlEdit_GetSel($argumentsEdit)
-			Local $string=GUICtrlRead($combo)
-			
-			_GUICtrlEdit_InsertText($argumentsEdit, $string, $index[0])
-			TrayTip($index[0],$index[0]+StringLen($string),30)
-			GUICtrlSetState($argumentsEdit,$GUI_FOCUS)
-			_GUICtrlEdit_SetSel($argumentsEdit, $index[0], $index[0]+StringLen($string))
-		
-		Case $OKButton
-			GUISetState(@SW_HIDE,$argumentsPrompt)
-			_argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
-			Return GUICtrlRead($argumentsEdit)
-		
-		Case $cancelButton
-			GUISetState(@SW_HIDE,$argumentsPrompt)
-			_argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
-			Return ""
-			
-		EndSwitch
-		
-		Sleep(50)
-		
-	WEnd
+   While 1
+
+      $nMsg = GUIGetMsg()
+
+      Switch $nMsg
+
+      Case $GUI_EVENT_CLOSE
+         GUISetState(@SW_HIDE,$argumentsPrompt)
+         _argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
+         Return ""
+
+      Case $bracketButton, $closeBracketButton
+
+         Local $index=_GUICtrlEdit_GetSel($argumentsEdit)
+         Local $prefix=""
+
+         If $nMsg==$bracketButton Then
+            $prefix="<"
+         Else
+            $prefix="</"
+         EndIf
+
+         _GUICtrlEdit_InsertText($argumentsEdit, $prefix, $index[0])
+         _GUICtrlEdit_InsertText($argumentsEdit, ">", $index[1]+StringLen($prefix))
+
+         GUICtrlSetState($argumentsEdit,$GUI_FOCUS)
+         _GUICtrlEdit_SetSel($argumentsEdit, $index[1]+StringLen($prefix)+1, $index[1]+StringLen($prefix)+1)
+
+      Case $clearButton
+         _GUICtrlEdit_SetText($argumentsEdit,"")
+
+      Case $combo
+         Local $index=_GUICtrlEdit_GetSel($argumentsEdit)
+         Local $string=GUICtrlRead($combo)
+
+         _GUICtrlEdit_InsertText($argumentsEdit, $string, $index[0])
+         TrayTip($index[0],$index[0]+StringLen($string),30)
+         GUICtrlSetState($argumentsEdit,$GUI_FOCUS)
+         _GUICtrlEdit_SetSel($argumentsEdit, $index[0], $index[0]+StringLen($string))
+
+      Case $OKButton
+         GUISetState(@SW_HIDE,$argumentsPrompt)
+         _argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
+         Return GUICtrlRead($argumentsEdit)
+
+      Case $cancelButton
+         GUISetState(@SW_HIDE,$argumentsPrompt)
+         _argumentsPromptProcessCheckbox($doNotShowAgainCheckbox)
+         Return ""
+
+      EndSwitch
+
+      Sleep(50)
+
+   WEnd
 
 EndFunc
 
 Func _argumentsPromptProcessCheckbox($checkbox)
 
-	If GUICtrlRead($checkbox)==1 Then 
-		_setBehaviour("promptIfNoArguments",0)
-	Else
-		_setBehaviour("promptIfNoArguments",1)
-	EndIf
+   If GUICtrlRead($checkbox)==1 Then
+      _setBehaviour("promptIfNoArguments",0)
+   Else
+      _setBehaviour("promptIfNoArguments",1)
+   EndIf
 
 EndFunc
