@@ -177,7 +177,7 @@
 #include "modules\trayMainMenu.au3"
 
 ;+++ Alex Kuryakin
-#include "wmCopyData.au3"
+#include <wmCopyData.au3>
 ;--- Alex Kuryakin
 
 Opt("GUIOnEventMode",1)
