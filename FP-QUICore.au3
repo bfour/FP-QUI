@@ -146,6 +146,7 @@
 #include <_talk.au3>
 #include <_config.au3>
 #include <_stringReplaceVariables.au3>
+#include <_pipe.au3>
 #include <_display.au3>
 #include <_command.au3>
 
@@ -200,7 +201,7 @@ Func _start()
 
    _debug("start")
 
-   ;if another instance is already up and running forward the CmdLine via wmcopydata
+   ;if another instance is already up and running forward the CmdLine
    If _Singleton("FP-QUICore", 1) == 0 Then
       ; another instance is likely to be existent
       _debug("another instance exists")
@@ -275,13 +276,18 @@ Func _main()
 
       ; <retrieve>
       $cycleCounter += 1
+	  $request=""
+
+	  $request=_pipeReceive("FP-QUI",0)
+	  If $request=="" Then $request=_pipeReceive("FP-QUI",0) ; TODO fix: *every second recv returns "" regardless of stuff being in the queue
 
         ;+++ Alex Kuryakin
-       If $request=="" Then
+	  If $request=="" Then
          If $wmCopyDataFifoCount > 0 Then
-           $request = wmCopyDataFifoGet()
+			_debug("wmCopyDataFifoGet()")
+            $request = wmCopyDataFifoGet()
          EndIf
-       EndIf
+	  EndIf
         ;--- Alex Kuryakin
 
       If $request<>"" Then _processRequest($request)
@@ -318,7 +324,6 @@ Func _main()
       EndIf
 
       Sleep($loopPause)
-      Next
 
       ; </process>
 
