@@ -25,65 +25,65 @@ Global $FPQUI_COREEXE_REGVALUE = "coreExe"
 
 Func _fpquiRegister($promptUser=Default, $dir=Default, $exe=Default, $coreExe=Default)
 
-	If $promptUser == Default Then $promptUser=0
-	If $dir == Default Then $dir = @ScriptDir
-	If $exe == Default Then $exe = "FP-QUI.exe"
-	If $coreExe == Default Then $coreExe = "FP-QUICore.exe"
+   If $promptUser == Default Then $promptUser=0
+   If $dir == Default Then $dir = @ScriptDir
+   If $exe == Default Then $exe = "FP-QUI.exe"
+   If $coreExe == Default Then $coreExe = "FP-QUICore.exe"
 
-	If $promptUser<>0 Then
-		Local $answer = MsgBox(1+64, @ScriptName, 'The following key will be added to your registry: "'&$FPQUI_REGKEY&'"')
-		If $answer == 2 Then Return SetError(1,0,"")
-	EndIf
+   If $promptUser<>0 Then
+      Local $answer = MsgBox(1+64, @ScriptName, 'The following key will be added to your registry: "'&$FPQUI_REGKEY&'"')
+      If $answer == 2 Then Return SetError(1,0,"")
+   EndIf
 
-	Local $return
+   Local $return
 
-	If $dir<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_DIR_REGVALUE, "REG_SZ", $dir)
-	If @error Then SetError(@error, @extended, $return)
+   If $dir<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_DIR_REGVALUE, "REG_SZ", $dir)
+   If @error Then SetError(@error, @extended, $return)
 
-	If $exe<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_EXE_REGVALUE, "REG_SZ", $exe)
-	If @error Then SetError(@error, @extended, $return)
+   If $exe<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_EXE_REGVALUE, "REG_SZ", $exe)
+   If @error Then SetError(@error, @extended, $return)
 
-	If $coreExe<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_COREEXE_REGVALUE, "REG_SZ", $coreExe)
-	If @error Then SetError(@error, @extended, $return)
+   If $coreExe<>"" Then $return = RegWrite($FPQUI_REGKEY, $FPQUI_COREEXE_REGVALUE, "REG_SZ", $coreExe)
+   If @error Then SetError(@error, @extended, $return)
 
-	Return $return
+   Return $return
 
 EndFunc
 
 
 Func _fpquiDeregister($promptUser=Default)
 
-	If $promptUser == Default Then $promptUser=0
+   If $promptUser == Default Then $promptUser=0
 
-	If $promptUser<>0 Then
-		Local $answer = MsgBox(1+64, @ScriptName, 'The following key will be removed from your registry: "'&$FPQUI_REGKEY&'"')
-		If $answer == 2 Then Return SetError(1,0,"")
-	EndIf
+   If $promptUser<>0 Then
+      Local $answer = MsgBox(1+64, @ScriptName, 'The following key will be removed from your registry: "'&$FPQUI_REGKEY&'"')
+      If $answer == 2 Then Return SetError(1,0,"")
+   EndIf
 
-	Local $return = RegDelete($FPQUI_REGKEY)
-	Return SetError(@error, @extended, $return)
+   Local $return = RegDelete($FPQUI_REGKEY)
+   Return SetError(@error, @extended, $return)
 
 EndFunc
 
 Func _fpquiGetRegister($option)
 
-	Local $return
-	Local $error
+   Local $return
+   Local $error
 
-	Switch $option
+   Switch $option
 
-	Case "dir" ;dir
-		$return = RegRead($FPQUI_REGKEY, $FPQUI_DIR_REGVALUE)
-		Return SetError(@error, @extended, $return)
+   Case "dir" ;dir
+      $return = RegRead($FPQUI_REGKEY, $FPQUI_DIR_REGVALUE)
+      Return SetError(@error, @extended, $return)
 
-	Case "exe" ;exe
-		$return = RegRead($FPQUI_REGKEY, $FPQUI_EXE_REGVALUE)
-		Return SetError(@error, @extended, $return)
+   Case "exe" ;exe
+      $return = RegRead($FPQUI_REGKEY, $FPQUI_EXE_REGVALUE)
+      Return SetError(@error, @extended, $return)
 
-	Case "coreExe" ;coreExe
-		$return = RegRead($FPQUI_REGKEY, $FPQUI_COREEXE_REGVALUE)
-		Return SetError(@error, @extended, $return)
+   Case "coreExe" ;coreExe
+      $return = RegRead($FPQUI_REGKEY, $FPQUI_COREEXE_REGVALUE)
+      Return SetError(@error, @extended, $return)
 
-	EndSwitch
+   EndSwitch
 
 EndFunc

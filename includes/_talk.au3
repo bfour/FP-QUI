@@ -30,41 +30,41 @@
 ; 40b FI FI
 Func _talk($string, $language=Default)
 
-	If $string=="" Then
-		SetError(1)
-		Return ""
-	EndIf
+   If $string=="" Then
+      SetError(1)
+      Return ""
+   EndIf
 
-	If $language==Default Then $language=409
+   If $language==Default Then $language=409
 
     Local $speech = ObjCreate("SAPI.SpVoice")
-	If @error Then
-		SetError(1)
-		Return ""
-	EndIf
+   If @error Then
+      SetError(1)
+      Return ""
+   EndIf
 
-	If @OSVersion == "WIN_8" Then
-		$speech.Voice = $speech.GetVoices("","Language="&$language).Item(0)
-	EndIf
+   If @OSVersion == "WIN_8" Then
+      $speech.Voice = $speech.GetVoices("","Language="&$language).Item(0)
+   EndIf
 
-	$speech.Volume=100
-	$speech.Speak($string)
+   $speech.Volume=100
+   $speech.Speak($string)
     $speech = ""
 
 EndFunc
 
 Func _talkListVoices()
 
-	Local $speech = ObjCreate("SAPI.SpVoice")
-	If @error Then
-		SetError(1)
-		Return ""
-	EndIf
+   Local $speech = ObjCreate("SAPI.SpVoice")
+   If @error Then
+      SetError(1)
+      Return ""
+   EndIf
 
-	$string = "test"
-	$voiceType = 1
+   $string = "test"
+   $voiceType = 1
 
-	Local $i = 0, $voice
+   Local $i = 0, $voice
     Dim $voiceTypes = $speech.GetVoices('', '')
 
     For $voice In $voiceTypes

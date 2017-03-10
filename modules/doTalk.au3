@@ -16,6 +16,8 @@
 
 #ce
 
+#include <_pipe.au3>
+
 Func _doTalk($i)
 
 	If $notificationsOptions[$i][15]<>"" Then

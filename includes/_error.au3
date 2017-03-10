@@ -20,8 +20,8 @@
 
 DEPRECATED: moved to _log.au3
 
-$interactive: 	1:interactive 0:silent
-$broadcast:		broadcast errorNotification in cluster
+$interactive:    1:interactive 0:silent
+$broadcast:      broadcast errorNotification in cluster
 
 #ce
 
@@ -31,66 +31,66 @@ $broadcast:		broadcast errorNotification in cluster
 
 Func _error($description,$interactive=Default,$broadcast=Default,$logEnabled=Default,$logDir=Default,$logFile=Default,$logMaxNumberOfLines=Default,$forceMsgBox=Default,$msgBoxTimeout=Default)
 
-	If $interactive=Default Then $interactive=1
-	If $broadcast=Default Then $broadcast=0
+   If $interactive=Default Then $interactive=1
+   If $broadcast=Default Then $broadcast=0
 
-	If $logEnabled=Default Then $logEnabled=0
-	If $logDir=Default Then $logDir=@ScriptDir
-	If $logFile=Default Then $logFile="log_"&@UserName&"_"&@ComputerName&".txt"
-	If $logMaxNumberOfLines=Default Then $logMaxNumberOfLines=1000
+   If $logEnabled=Default Then $logEnabled=0
+   If $logDir=Default Then $logDir=@ScriptDir
+   If $logFile=Default Then $logFile="log_"&@UserName&"_"&@ComputerName&".txt"
+   If $logMaxNumberOfLines=Default Then $logMaxNumberOfLines=1000
 
-	If $forceMsgBox=Default Then $forceMsgBox=0
-	If $msgBoxTimeout==Default Then $msgBoxTimeout=0 ;0...no timeout
+   If $forceMsgBox=Default Then $forceMsgBox=0
+   If $msgBoxTimeout==Default Then $msgBoxTimeout=0 ;0...no timeout
 
-	;show
-	If $interactive Then
+   ;show
+   If $interactive Then
 
-		Local $iconPath=@AutoItExe
-		;take icon.ico in current dir as icon if existent
-		;if not, take current exe's icon instead
-		If FileExists(@ScriptDir&"\icon.ico")==1 Then $iconPath=@ScriptDir&"\icon.ico"
+      Local $iconPath=@AutoItExe
+      ;take icon.ico in current dir as icon if existent
+      ;if not, take current exe's icon instead
+      If FileExists(@ScriptDir&"\icon.ico")==1 Then $iconPath=@ScriptDir&"\icon.ico"
 
 
-		Local $notifierInstructions='<text>'&StringReplace(@ScriptName,".exe","")&'@'&@ComputerName&': '&$description&'</text><ico>'&$iconPath&'</ico><bkColor>red</bkColor><untilClick><any>1</any></untilClick><noDouble>1</noDouble>'
+      Local $notifierInstructions='<text>'&StringReplace(@ScriptName,".exe","")&'@'&@ComputerName&': '&$description&'</text><ico>'&$iconPath&'</ico><bkColor>red</bkColor><untilClick><any>1</any></untilClick><noDouble>1</noDouble>'
 
-		Local $gridDir = _gridDir()
-		If _gridDir() <> "" And FileExists(_gridDir()&'\FP-QUI\FP-QUI.exe')==1 And $forceMsgBox==0 Then
+      Local $gridDir = _gridDir()
+      If _gridDir() <> "" And FileExists(_gridDir()&'\FP-QUI\FP-QUI.exe')==1 And $forceMsgBox==0 Then
 
-			;run FP-QUI
-			Run(_gridDir()&'\FP-QUI\FP-QUI.exe '&$notifierInstructions)
+         ;run FP-QUI
+         Run(_gridDir()&'\FP-QUI\FP-QUI.exe '&$notifierInstructions)
 
-		Else
+      Else
 
-			MsgBox(0+16,@ScriptName&"/Error", _
-				@YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
-				$description&@LF& _
-				@LF& _
-				"Please help make this software better by filing a bug-report.", $msgBoxTimeout)
+         MsgBox(0+16,@ScriptName&"/Error", _
+            @YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
+            $description&@LF& _
+            @LF& _
+            "Please help make this software better by filing a bug-report.", $msgBoxTimeout)
 
-		EndIf
+      EndIf
 
-		;broadcast if specified
-;~ 		If $broadcast==1 Then Run('"'&_gridDir()&'\FP-Intercom\FP-IntercomClient.exe" "<recip>%all%</recip><msg>%grid%\FP-QUI\FP-QUI.exe '&$notifierInstructions&'</msg>"')
+      ;broadcast if specified
+;~       If $broadcast==1 Then Run('"'&_gridDir()&'\FP-Intercom\FP-IntercomClient.exe" "<recip>%all%</recip><msg>%grid%\FP-QUI\FP-QUI.exe '&$notifierInstructions&'</msg>"')
 
-	EndIf
+   EndIf
 
-	;log
-	If $logEnabled==1 Then _log($logEnabled,$description,$logDir,$logFile,$logMaxNumberOfLines)
+   ;log
+   If $logEnabled==1 Then _log($logEnabled,$description,$logDir,$logFile,$logMaxNumberOfLines)
 
 EndFunc
 
 Func _warning($description,$interactive=Default,$broadcast=Default,$logEnabled=Default,$logDir=Default,$logFile=Default,$logMaxNumberOfLines=Default,$forceMsgBox=Default,$msgBoxTimeout=Default)
 
    MsgBox(0+48,@ScriptName&"/Warning", _
-	   @YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
-	   $description, $msgBoxTimeout)
+      @YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
+      $description, $msgBoxTimeout)
 
 EndFunc
 
 Func _info($description,$interactive=Default,$broadcast=Default,$logEnabled=Default,$logDir=Default,$logFile=Default,$logMaxNumberOfLines=Default,$forceMsgBox=Default,$msgBoxTimeout=Default)
 
    MsgBox(0+64,@ScriptName&"/Info", _
-	   @YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
-	   $description, $msgBoxTimeout)
+      @YEAR&@MON&@MDAY&@HOUR&@MIN&@SEC&": " &@UserName&"@"&@ComputerName&":" &@LF& _
+      $description, $msgBoxTimeout)
 
 EndFunc

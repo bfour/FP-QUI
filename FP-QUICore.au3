@@ -264,15 +264,17 @@ Func _main()
 
    _debug("main")
 
-   Local $loopPause          = 400
-   Local $request             = ""
-   Local $cycleCounter       = 0
+   Local $loopPause       = 400
+   Local $request         = ""
+   Local $cycleCounter    = 0
 
     ;+++ Alex Kuryakin
    wmCopyDataInit()
     ;--- Alex Kuryakin
 
    While 1
+
+;~ 	  _debug(@LF&@LF&"cycle start")
 
       ; <retrieve>
       $cycleCounter += 1
@@ -391,11 +393,11 @@ Func _processRequest($requestString)
    ;go
    Local $reply=""
 
-   If $options[32][1]<>"" Then ;update
+   If $options[32][1]<>"" Then ; update
 
       _debug("process request: update")
 
-      ;we simply append the update without the "update" tags to the current requestString (options), to force an overwrite of the attributes to be updated
+      ; we simply append the update without the "update" tags to the current requestString (options), to force an overwrite of the attributes to be updated
 
       $winHandle = _commandLineInterpreter($options[32][1],"winHandle")
       $winHandle = $winHandle[0][1]
@@ -416,18 +418,17 @@ Func _processRequest($requestString)
 
       Local $currentRequestString=_optionsArrayToString($currentRequestArray)
 
-
       $requestString = _commandLineInterpreter($requestString,"update")
       $requestString = $requestString[0][1]
 
-;~ ConsoleWrite($currentRequestString &"#########"& $requestString&@LF)
+	  _debug($currentRequestString &"#########"& $requestString&@LF)
 
       _processRequest($currentRequestString & $requestString)
 
       ;this time we do not want to send a reply (this has already been done in the function-call above if specified)
       $options[27][1]=""
 
-   ElseIf $options[31][1]<>"" Then ;delete
+   ElseIf $options[31][1]<>"" Then ; delete
 
       _debug("process request: delete")
 
@@ -436,9 +437,9 @@ Func _processRequest($requestString)
 
       $reply=$options[31][1]
 
-   ElseIf $options[26][1]<>"" Then ;winHandle<>"" --> update notif
+   ElseIf $options[26][1] <> "" Then ;winHandle<>"" --> update notif
 
-;~ _debug("process request/update winhandle specified/start")
+	  _debug("process request/update winhandle specified/start")
 
       ;if this notification is visible (and exists) simply do an update
       If _notificationVisible($options[26][1])==1 Then

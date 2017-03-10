@@ -59,7 +59,7 @@ Func _forwardRequest($input)
    ;no reply requested
    If $input<>"" And $replyInstructions[0][1]=="" And $replyInstructions[1][1]=="" Then
 
-      Local $return=_pipeSend("FP-QUI",$input,$pipeRetries,$pipeTimeout)
+      Local $return = _pipeSend("FP-QUI",$input,$pipeRetries,$pipeTimeout)
 
       If $return<>1 Then
          _error("_start (other instance running/update (noreply)): _pipeSend encountered an error, could not send invoke to main; return="&$return,$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)

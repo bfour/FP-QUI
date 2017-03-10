@@ -381,7 +381,7 @@ Func _setPosByHandle($handle, $x, $y, $width="", $height="")
 ;~    Local $speed=1
 ;~ 		If $distance<200 Then $speed=2
 
-   _debug("set pos by handle: "&$handle&"@"&$x&","&$y&","&$width&","&$height)
+;~    _debug("set pos by handle: "&$handle&"@"&$x&","&$y&","&$width&","&$height)
    WinMove($handle, "", $x, $y, $width, $height)
 
 EndFunc
