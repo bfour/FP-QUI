@@ -180,6 +180,7 @@
 #include <wmCopyData.au3>
 ;--- Alex Kuryakin
 
+OnAutoItExitRegister("_exit")
 Opt("GUIOnEventMode",1)
 
 Global $debug = 1
@@ -1321,7 +1322,8 @@ Func _processNotificationsDeleteRequests()
 
 EndFunc
 
-Func OnAutoItExit()
+Func _exit()
+   _debug("_exit")
    If $behaviourAutoDeregister == 1 Then _deregister(0, 1)
    If @error Then _logError("Deregistering FP-QUI failed:"&@LF&"@error="&@error&@LF&"@extended="&@extended&@LF&"$behaviourAutoRegister="&$behaviourAutoRegister, $errorInteractive, $errorInteractive, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
 EndFunc
