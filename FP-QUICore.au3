@@ -274,7 +274,6 @@ Func _main()
    While 1
 
       ; <retrieve>
-      Sleep(12)
       $cycleCounter += 1
 
         ;+++ Alex Kuryakin
@@ -286,10 +285,10 @@ Func _main()
         ;--- Alex Kuryakin
 
       If $request<>"" Then _processRequest($request)
-      If Mod($cycleCounter,2) == 0 And $request <> "" Then
-;~          _debug("~~~~~~~ bounce")
-         ContinueLoop
-      EndIf
+
+	  ; in 9 of 10 cycles, if we have received a request, skip processing
+	  ; of existing notifications and be ready for new request immediately
+      If Mod($cycleCounter, 10) <> 0 And $request <> "" Then ContinueLoop
 
       ; </retrieve>
 
@@ -307,17 +306,18 @@ Func _main()
 
       ;adjust loopPause, based on request and existing notifications
       If UBound($notificationsHandles)<=2 And $request=="" Then
-         $loopPause=100
+         $loopPause = 400
       ElseIf UBound($notificationsHandles)<=4 And $request=="" Then
-         $loopPause=80
+         $loopPause = 90
       ElseIf UBound($notificationsHandles)>4 And $request=="" Then
-         $loopPause=60
+         $loopPause = 60
+	  ElseIf UBound($notificationsHandles)>10 And $request=="" Then
+		 $loopPause = 30
       Else
          $loopPause=1
       EndIf
 
-      For $i=0 To $loopPause Step 20
-         Sleep(50)
+      Sleep($loopPause)
       Next
 
       ; </process>
