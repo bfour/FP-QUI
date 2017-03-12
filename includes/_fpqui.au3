@@ -19,6 +19,7 @@
 
 #include-once
 
+#include <Misc.au3>
 #include <_fpquiRegister.au3>
 
 #include <_commandLineInterpreter.au3>
@@ -37,20 +38,30 @@ Global $FPQUI_INVALIDPARAMETERS_CODE    = 32
 Global $FPQUI_INVALIDARGUMENTS_CODE     = 64
 
 Global $FPQUI_DEFAULT_RETURNPIPE_NAME 	= "_fpqui"&@AutoItPID
-Global $FPQUI_DEFAULT_RETURNPIPE_HANDLE = _pipeCreate($FPQUI_DEFAULT_RETURNPIPE_NAME, 0)
-
+Global $FPQUI_DEFAULT_RETURNPIPE_HANDLE = ""
+Global $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY = 0
 
 Global $FPQUI_DEBUGTIMER = TimerInit()
+Global $FPQUI_DEBUGTIMER_MEMORY = $FPQUI_DEBUGTIMER
 Func _fpquiDebug($string)
-;~ 	ConsoleWrite(TimerDiff($FPQUI_DEBUGTIMER)&" - "&$string&@LF)
+   Local $diff = TimerDiff($FPQUI_DEBUGTIMER)
+   ConsoleWrite(Round($diff,2)&" - "&Round($diff-$FPQUI_DEBUGTIMER_MEMORY,2)&" - "&$string&@LF)
+   $FPQUI_DEBUGTIMER_MEMORY = $diff
 EndFunc
 
+; $args    ... arguments for FP-QUICore describing the notification to be displayed
+; $handle    ... handle to a previously created message which will
+;             then be updated with the given arguments
+; $createIfNotVisible   ... whether to create a new message if a handle is
+;                     provided but the corresponding message is not visible
+; $errorHandling       ... error handling parameters
+; $returnPipeName       ... name
+Func _fpqui($args, $handle=Default, $createIfNotVisible=Default, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $receiveBlocking = Default)
 
-Func _fpqui($args, $handle=Default, $createIfNotVisible=Default, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default)
+   _fpquiDebug("_fpqui: method called")
 
-	_fpquiDebug("_fpqui/")
-
-	If $createIfNotVisible == Default Then $createIfNotVisible=1
+   If $createIfNotVisible == Default Then $createIfNotVisible = 1
+   If $receiveBlocking    == Default Then $receiveBlocking = 0
 
    ;prepare error handling
    $errorHandling = _commandLineInterpreter($errorHandling, "coreNotRunning;corePath;requestFailed;sendMaxRetries;sendRetryPause;responseFailed;receiveMaxRetries;receiveRetryPause")
@@ -68,9 +79,13 @@ Func _fpqui($args, $handle=Default, $createIfNotVisible=Default, $errorHandling=
    Local $receiveMaxRetries       = $errorHandling[6][1]
    Local $receiveRetryPause       = $errorHandling[7][1]
 
-	;prepare return pipe
-	If $returnPipeName 		== Default Then $returnPipeName 	= $FPQUI_DEFAULT_RETURNPIPE_NAME
-	If $returnPipeHandle 	== Default Then $returnPipeHandle 	= $FPQUI_DEFAULT_RETURNPIPE_HANDLE
+   ;prepare return pipe
+   If $returnPipeName 		== Default Then $returnPipeName 	= $FPQUI_DEFAULT_RETURNPIPE_NAME
+   If $returnPipeHandle 	== Default Then
+	  If $FPQUI_DEFAULT_RETURNPIPE_HANDLE == "" Or $receiveBlocking <> $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY Then $FPQUI_DEFAULT_RETURNPIPE_HANDLE = _pipeCreate($returnPipeName, $receiveBlocking)
+	  $returnPipeHandle = $FPQUI_DEFAULT_RETURNPIPE_HANDLE
+   EndIf
+   $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY = $receiveBlocking
 
    _fpquiDebug("_fpqui/prepare return pipe done: $returnPipeName="&$returnPipeName&" $returnPipeHandle="&$returnPipeHandle)
 
@@ -113,18 +128,20 @@ EndFunc
 ; (includes handling of case where QUICore is not running)
 Func _fpquiComm(ByRef $request, _
       $returnPipeName, $returnPipeHandle, _
-		$corePath=Default, $coreNotRunningHandling=Default, _
-		$sendMaxRetries=Default, $sendRetryPause=Default, $receiveMaxRetries=Default, $receiveRetryPause=Default, _
-		$requestFailedHandling=Default, $responseFailedHandling=Default)
+      $corePath=Default, $coreNotRunningHandling=Default, _
+      $sendMaxRetries=Default, $sendRetryPause=Default, _
+	  $receiveBlocking = Default, $receiveMaxRetries=Default, $receiveRetryPause=Default, _
+      $requestFailedHandling=Default, $responseFailedHandling=Default)
 
    _fpquiDebug("_fpquiComm/")
    _fpquiDebug("_fpquiComm/ $args="&$request)
 
    If $coreNotRunningHandling    == Default Then $coreNotRunningHandling = "tryAndReturn"
-   If $sendMaxRetries            == Default Then $sendMaxRetries = 6
+   If $sendMaxRetries            == Default Then $sendMaxRetries = 8
    If $sendRetryPause            == Default Then $sendRetryPause = 86
-   If $receiveMaxRetries         == Default Then $receiveMaxRetries = 6
-   If $receiveRetryPause         == Default Then $receiveRetryPause = 86
+   If $receiveBlocking           == Default Then $receiveBlocking = 0
+   If $receiveMaxRetries         == Default Then $receiveMaxRetries = 18
+   If $receiveRetryPause         == Default Then $receiveRetryPause = 28
    If $requestFailedHandling     == Default Then $requestFailedHandling = "cmdLineFallbackAndReturn"
    If $responseFailedHandling    == Default Then $responseFailedHandling = "return"
    If $corePath                  <> Default Then
@@ -133,6 +150,8 @@ Func _fpquiComm(ByRef $request, _
          Return ""
       EndIf
    EndIf
+
+   If $receiveBlocking == 1 Then $receiveMaxRetries = 0
 
    Local $pipeReplyCode = "<reply><pipe>"&$returnPipeName&"</pipe></reply>"
 
@@ -145,58 +164,13 @@ Func _fpquiComm(ByRef $request, _
 ;~    _fpquiDebug("_fpquiComm/$receiveRetryPause="&$receiveRetryPause)
    _fpquiDebug("_fpquiComm/end prep ret pip")
 
-	;initial send request
-	If _pipeSend("FP-QUI", $request & $pipeReplyCode, 0) <> 1 Then ; note that $pipeReplyCode is appended as a suffix, thereby causing an override of any other reply-settings in $request
+   Local $ret = _ensureCoreRunning($coreNotRunningHandling, $corePath)
+   If @error Then Return SetError(@error, @extended, $ret)
 
-		_fpquiDebug("_fpquiComm/first pipe send failed")
+   ; send request
+   If _pipeSend("FP-QUI", $request & $pipeReplyCode, 0) <> 1 Then ; note that $pipeReplyCode is appended as a suffix, thereby causing an override of any other reply-settings in $request
 
-		While 1==1
-
-			;check if core is running
-			If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then
-
-				_fpquiDebug("_fpquiComm/core pipe inexistent")
-
-				; pipe does not exist --> not running
-				Switch $coreNotRunningHandling
-
-				Case "return"
-					_fpquiDebug("_fpquiComm/first send req/Case return")
-					Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
-
-				Case "tryAndReturn"
-					_fpquiDebug("_fpquiComm/first send req/Case tryAndReturn")
-					_fpquiFindAndStartCore($corePath)
-					If @error Then Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
-
-				Case "tryAndPrompt"
-					_fpquiDebug("_fpquiComm/first send req/Case tryAndPrompt")
-					Local $answer = MsgBox (6+16, @ScriptName, "This program requires FP-QUICore to be running. FP-QUI can be downloaded at http://fp-qui.sourceforge.net/. You will be prompted for a path to FP-QUICore.exe. You may abort this by clicking on CANCEL, retry by clicking on RETRY or continue by clicking on CONTINUE.")
-
-					Switch $answer
-
-					Case 3 ;abort
-						Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
-					Case 4, 10 ;retry, try again
-						ContinueLoop
-					Case 11 ;continue
-						Local $path = FileOpenDialog(@ScriptName, @ProgramFilesDir, "exe (*.exe)|all (*.*)", 3, "FP-QUI.exe")
-						If @error Then
-							Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
-						Else
-							_fpquiStartAndSaveCore($path)
-							If @error Then Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
-						EndIf
-
-					EndSwitch
-
-				EndSwitch
-
-			EndIf
-
-		ExitLoop
-		WEnd
-
+	  _fpquiDebug("_fpquiComm/first pipe send failed")
 
       ;further send requests
       _fpquiDebug("_fpquiComm/further send requests")
@@ -240,7 +214,7 @@ Func _fpquiComm(ByRef $request, _
    For $i = 0 To $receiveMaxRetries
 
 	  _fpquiDebug("_fpquiComm/receive/cycle start")
-		$recv = _pipeReceive($returnPipeName, 0, $returnPipeHandle)
+	  $recv = _pipeReceive($returnPipeName, $receiveBlocking, $returnPipeHandle)
 
 	  If @error Then
 		 _fpquiDebug("piperecv error="&@error)
@@ -275,6 +249,59 @@ Func _fpquiComm(ByRef $request, _
 
    ;everything's OK :-)
    Return SetError(0,0,$recv)
+
+EndFunc
+
+Func _ensureCoreRunning($coreNotRunningHandling, $corePath)
+
+   _fpquiDebug("_ensureCoreRunning")
+
+   While 1==1
+
+	  If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then ; is core running?
+
+		 _fpquiDebug("_ensureCoreRunning/core not running")
+
+		 Switch $coreNotRunningHandling
+
+		 Case "return"
+			_fpquiDebug("_ensureCoreRunning/first send req/Case return")
+			Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
+
+		 Case "tryAndReturn"
+			_fpquiDebug("_ensureCoreRunning/first send req/Case tryAndReturn")
+			_fpquiFindAndStartCore($corePath)
+			If @error Then Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
+
+		 Case "tryAndPrompt"
+			_fpquiDebug("_ensureCoreRunning/first send req/Case tryAndPrompt")
+			Local $answer = MsgBox (6+16, @ScriptName, "This program requires FP-QUICore to be running. FP-QUI can be downloaded at http://fp-qui.sourceforge.net/. You will be prompted for a path to FP-QUICore.exe. You may abort this by clicking on CANCEL, retry by clicking on RETRY or continue by clicking on CONTINUE.")
+
+			Switch $answer
+
+			Case 3 ;abort
+			   Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
+			Case 4, 10 ;retry, try again
+			   ContinueLoop
+			Case 11 ;continue
+			   Local $path = FileOpenDialog(@ScriptName, @ProgramFilesDir, "exe (*.exe)|all (*.*)", 3, "FP-QUI.exe")
+			   If @error Then
+				  Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
+			   Else
+				  _fpquiStartAndSaveCore($path)
+				  If @error Then Return SetError($FPQUI_CORENOTRUNNING_CODE, 0, "")
+			   EndIf
+
+			EndSwitch
+
+		 EndSwitch
+
+	  Else
+		  _fpquiDebug("_ensureCoreRunning/core seems to be running")
+	  EndIf
+
+   ExitLoop
+   WEnd
 
 EndFunc
 
