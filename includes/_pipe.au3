@@ -28,9 +28,9 @@ Global $_pipe_defaultPipeHandle = ""
 ;return: success: 1; failure: 0 and <>1
 Func _pipeSend($pipeName, $data, $maxRetries=Default, $retryPause=Default, $retries=Default)
 
-   If $maxRetries == Default Then $maxRetries=20
-   If $retryPause == Default Then $retryPause=100   
-   If $retries    =  = Default Then $retries=0
+   If $maxRetries == Default Then $maxRetries = 10
+   If $retryPause == Default Then $retryPause = 500
+   If $retries    == Default Then $retries = 0
 
    Local Const $vzbEZ_PIPE_NAME = "\\.\pipe\"&$pipeName
 
@@ -168,8 +168,8 @@ Func _pipeReceive($pipeName, $wait=Default, $pipeHandle = Default)
    Local $cache=_NamedPipes_PeekNamedPipe($pipeHandle)
 
    Local $error=@error ;error: 0 ... data received, all fine; 230 no input; 109 ...  empty message received (?)
+   If @error Then Return SetError(4, 0, "")
 
-	;$cache[0]=_StringReverse($cache[0])
    $return=$cache[0]
 
 ;~       ConsoleWrite(@LF)
