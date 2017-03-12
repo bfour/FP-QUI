@@ -38,6 +38,7 @@
 Global $_configInit = False
 
 #Include <Misc.au3>
+#Include <NamedPipes.au3>
 
 #include <_run.au3>
 
@@ -64,7 +65,7 @@ Local $request = $CmdLineRaw
 If $request == "" Then $request = "<system><menu>1</menu></system>"
 
 ; check whether core is running
-If _Singleton("FP-QUICore", 1) == 0 Then
+If Not _NamedPipes_WaitNamedPipe("\\.\pipe\FP-QUI") Then
    ; core not running -> launch it
    _run(@ScriptDir&"\FP-QUICore.exe")
    If ProcessWait("FP-QUICore.exe",10)==0 Then
