@@ -487,6 +487,7 @@ Func _processRequest($requestString)
    Local $replyInstructions = _commandLineInterpreter($options[27][1], "pipe;wmcopydataHandle;stdout")
    Local $replyPipe         = $replyInstructions[0][1]
    Local $replyCDHandle     = $replyInstructions[1][1]
+   Local $replyStdout       = $replyInstructions[2][1]
 
 	  ;via pipe
 	If $replyPipe<>"" Then
@@ -508,7 +509,7 @@ Func _processRequest($requestString)
    EndIf
 
       ;via stdout
-   If $replyInstructions[2][1]<>"" Then ConsoleWrite($reply)
+   If $replyStdout <> "" Then ConsoleWrite($reply)
 
 EndFunc
 
