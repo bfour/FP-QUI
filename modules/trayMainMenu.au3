@@ -5,14 +5,16 @@
 
 Func _trayMainMenu()
 
+   Opt("TrayAutoPause", 0)
    Opt("TrayMenuMode", 1+2)
    Opt("TrayOnEventMode", 1)
 
-   Local $terminateEntry = TrayCreateItem("Terminate")
-   Local $restartEntry = TrayCreateItem("Restart")
    Local $helpEntry = TrayCreateItem("Help")
    Local $configureEntry = TrayCreateItem("Configure")
    Local $generateCodeEntry = TrayCreateItem("Generate Code")
+   TrayCreateItem("") ; separator line
+   Local $terminateEntry = TrayCreateItem("Terminate")
+   Local $restartEntry = TrayCreateItem("Restart")
 
    TrayItemSetOnEvent($terminateEntry, "_trayMainMenuTerminate")
    TrayItemSetOnEvent($restartEntry, "_trayMainMenuRestart")
@@ -29,7 +31,7 @@ EndFunc
 
 Func _trayMainMenuRestart()
    _debug("_trayMainMenuRestart")
-   _run(@ScriptDir&'\tools\FP-BatchProcessor.exe "<runWait><cmd>taskkill /PID @AutoItPID /F</cmd></runWait><run><cmd>@ScriptDir\FP-QUICore.exe</cmd></run>"')
+   _run(@ScriptDir&'\tools\FP-BatchProcessor.exe "<runWait><cmd>taskkill /PID @AutoItPID /F</cmd></runWait><run><cmd>'&@ScriptDir&'\FP-QUICore.exe</cmd></run>"')
 EndFunc
 
 Func _trayMainMenuHelp()
