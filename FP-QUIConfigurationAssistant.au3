@@ -16,6 +16,7 @@
 
 #ce
 
+#include <MsgBoxConstants.au3>
 #Include <GuiComboBox.au3>
 #Include <GuiListBox.au3>
 #Include <Misc.au3>
@@ -67,7 +68,6 @@ Func _initializeGUI()
 	;configuration
 	GUICtrlSetData($configPathCombo, _iniRead($globalConfigPath, "_ini", "specificPath", "@ScriptDir\data\config_@UserName_@ComputerName.ini"))
 
-
 	;behaviour
 	If $behaviourShowMenuOnFirstStart == 1 Then
 		GUICtrlSetState($showMenuOnFirstStartCheckbox, $GUI_CHECKED)
@@ -103,28 +103,12 @@ Func _initializeGUI()
 		GUICtrlSetState($fadeOutCheckbox, $GUI_UNCHECKED)
 	EndIf
 
-	;colors
-;~ 	_GUICtrlListBox_ResetContent($colorsListBox)
-;~
-;~ 	Local $counter = 0
-;~ 	For $color In $colorsAvailable
-;~
-;~ 		_GUICtrlListBox_AddString($colorsListBox, $color)
-;~ 		$varName = "colors" & StringUpper(StringLeft($color,1)) & StringTrimLeft($color,1)
-;~ 		_GUICtrlListBox_SetItemData($colorsListBox, $counter, Eval($varName))
-;~
-;~ 		$counter+=1
-;~
-;~ 	Next
-;~ 	GUICtrlSetData($colorsInput, "")
-
 EndFunc
 
 Func _save()
 
 	;configuration
 	_iniWrite($globalConfigPath, "_ini", "specificPath", GUICtrlRead($configPathCombo))
-
 
 	;behaviour
 	If GUICtrlRead($showMenuOnFirstStartCheckbox) == 1 Then
@@ -145,7 +129,6 @@ Func _save()
 		_setConfiguration("behaviour", "autoDeregister", 0)
 	EndIf
 
-
 	;defaults
 	_setConfiguration("defaults", "font", 				GUICtrlRead($fontInput))
 	_setConfiguration("defaults", "fontSize", 			GUICtrlRead($fontSizeInput))
@@ -160,16 +143,6 @@ Func _save()
 	Else
 		_setConfiguration("behaviour", "fadeOut", 0)
 	EndIf
-
-
-	;colors
-;~ 	Local $text
-;~ 	Local $color
-;~ 	For $i=0 To _GUICtrlListBox_GetCount($colorsListBox)
-;~ 		$colorName = _GUICtrlListBox_GetText($colorsListBox, $i)
-;~ 		$colorValue = _GUICtrlListBox_GetItemData($colorsListBox, $i)
-;~ 		_setConfiguration("colors", $colorName, $colorValue)
-;~ 	Next
 
 	_hideConfigurationAssistantGUI()
 ;~ 	_promptForRestart()
@@ -290,11 +263,8 @@ Func _mainLoop()
 	Case $fontPropertiesDefaultButton
 
 		If @OSVersion == "WIN_2003" OR @OSVersion == "WIN_XP" OR @OSVersion == "WIN_2000" Then
-<<<<<<< HEAD
 			GUICtrlSetData($fontInput, "Microsoft Sans Serif")
-=======
 			GUICtrlSetData($fontInput, "Arial")
->>>>>>> remotes/TUWien/master
 		Else
 			GUICtrlSetData($fontInput, "Segoe UI")
 		EndIf

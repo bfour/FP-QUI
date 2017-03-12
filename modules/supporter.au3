@@ -20,14 +20,12 @@
 
 #include <_run.au3>
 
-;searches for handle in $notificationsHandles, returns first array-index
-;returns "" if handle not found
+; searches for handle in $notificationsHandles, returns first array-index
+; returns "" and sets @error to 1 if handle not found
 Func _handleToID($handle)
-
 	For $i=1 To UBound($notificationsHandles)-1
 		If $notificationsHandles[$i][0] == $handle Then Return $i
 	Next
-
 	SetError(1)
 	Return ""
 

@@ -15,20 +15,20 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  
+    along with this program.
 	If not, see http://www.gnu.org/licenses/gpl.html.
-	
+
 #ce
 
 #include-once
 
 Func _initializeInterface()
+
+	Global Const $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system;noReposAfterHide"
+	Global Const $numberOfOptions=UBound(StringSplit($cmdLineDescriptorRequest,";",3))
 	
-	Global $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system;noReposAfterHide"
-	Global $numberOfOptions=UBound(StringSplit($cmdLineDescriptorRequest,";",3))
-	
-	Global $numberOfHandles=6
-	
+	Global Const $numberOfHandles=6
+
 EndFunc
 
 

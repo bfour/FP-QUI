@@ -108,6 +108,7 @@
       you may enclose commands in <shellOpen> (shell execute, verb: open) or <internal> (nested notification commands)
  26 <winHandle>
  27 <reply>
+	  <pipe> set to <>"" and provide a valid pipe name if you want a reply via named pipe
       <wmcopydataHandle> set to <>"" and provide a valid window handle if you want a wmcopydata reply
       <stdout> set to <>"" if you want an stdout reply
  28 <dispatcherArea> ... overwrite config; [screen1|screen2|screen3 …|x,y,width,height]
@@ -360,14 +361,13 @@ Func _processRequest($requestString)
    _debug("process request: options parse end")
 
    ;replaceVar
-;~    $options=_replaceVar($options)
    _replaceVar($options) ; by ref!
    _debug("process request: options replace var end")
 
    ;check requestString
-   Local $requestArray=_commandLineInterpreter($requestString)
+   Local $requestArray = _commandLineInterpreter($requestString)
    _debug("process request: requestArray build end")
-   Local $validDescriptors=StringSplit($cmdLineDescriptorRequest,";",3)
+   Local $validDescriptors = StringSplit($cmdLineDescriptorRequest,";",3)
    Local $valid=0
    Local $invalidDescriptors=""
 
@@ -709,8 +709,6 @@ _debug("start update func")
       ;set default icon if qui would be completely empty
       If $options[0][1] == "" And $options[6][1] == "" And $options[24][1] == "" And $options[25][1] == "" And $options[22][1] == "" Then $options[6][1] = $defaultIcon
 
-
-
 _debug("store options start")
 
       ;locally store options
@@ -759,12 +757,10 @@ _debug("store options start")
             $bkColor=$colorsPurple
          Case "yellow"
             $bkColor=$colorsYellow
-
       EndSwitch
 
       ;if bkColor is still invalid, set 0x98C9FA
       If StringRegExp($bkColor,"0x[0123456789ABCDEFabcdef]{1,6}")==0 Then $bkColor=0x98C9FA
-
 
       ;ico
       Local $icon=$options[6][1]
@@ -934,9 +930,7 @@ _debug("store options end, prepare handles start")
       $notificationsHandles[$ID][4]=$progressHandle
       $notificationsHandles[$ID][5]=$buttonHandles
 
-
-
-_debug("prep handles end, set size and pos start")
+	  _debug("prep handles end, set size and pos start")
       ;set size and position
 
          ;sub-globals
@@ -960,7 +954,7 @@ _debug("prep handles end, set size and pos start")
 
          ;icon
       If $icon <> "" Then
-_debug("icon")
+		 _debug("icon")
 
          Local $iconWidth = $defaultIconAviSize
          Local $iconHeight = $defaultIconAviSize
@@ -1206,8 +1200,6 @@ _debug("set data end, spec func start")
 
 _debug("spec func end")
 
-
-
       ;force redraw (hotfix)
       _WinAPI_RedrawWindow($notificationsHandles[$ID][0])
 
@@ -1263,7 +1255,7 @@ Func _hideNotification($ID)
       GUISetState(@SW_HIDE,$winHandle)
 
 ;~        If $notificationsOptions[$ID][35]=="" Then _reflow($ID)
-If $notificationsOptions[$ID][35]=="" Then _repositionAll()
+	  If $notificationsOptions[$ID][35]=="" Then _repositionAll()
 
       ;add a delete request
       ReDim $notificationsDeleteRequests[UBound($notificationsDeleteRequests)+1]
@@ -1287,7 +1279,7 @@ EndFunc
 Func _processNotificationsDeleteRequests()
 
    ; Make a copy of this array. All requests that are added while this func executes are ignored. This avoids outOfBounds-Errors.
-   Local $deleteRequest=$notificationsDeleteRequests
+   Local $deleteRequest = $notificationsDeleteRequests
 
    For $i=1 To UBound($deleteRequest)-1
 

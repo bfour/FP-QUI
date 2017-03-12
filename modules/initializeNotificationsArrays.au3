@@ -15,22 +15,22 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  
+    along with this program.
 	If not, see http://www.gnu.org/licenses/gpl.html.
-	
+
 #ce
 
 #include-once
 
 Func _initializeNotificationsArrays()
-	
-	; [0: GUI-Handle, 1: ico-Handle, 2: avi-Handle, 3: label-Handle, 4: progress-Handle, 5: button-handles (<1>handle</1> etc.)
+
+	; 0: GUI-Handle, 1: ico-Handle, 2: avi-Handle, 3: label-Handle, 4: progress-Handle, 5: button-handles (<1>handle</1> etc.), 6: GUID
 	Global $notificationsHandles[1][$numberOfHandles]
-	; notificationsOptions: n,21: test.wav 
+	; notificationsOptions: eg. n,21: test.wav
 	Global $notificationsOptions[1][$numberOfOptions]
-	; $notificationsOptionsData: n,21: how often has sound been played		
+	; $notificationsOptionsData: eg. n,21: how often has sound been played
 	Global $notificationsOptionsData[1][$numberOfOptions]
-	
+
 	Global $notificationsDeleteRequests[1] ; Array containing winHandles (/IDs) to be deleted. If a notification is closed a request is stored in this array. Once the main loop has finished, all notificationsArray-entries will be deleted according to this array. This avoids outOfBounds-Errors during the execution of the main loop, when a user generates a click-event that causes a notification to close
-	
+
 EndFunc

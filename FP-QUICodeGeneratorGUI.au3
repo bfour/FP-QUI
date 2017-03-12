@@ -45,6 +45,7 @@ _setStatus()
 Global $debugTimer = TimerInit()
 Global $debug = 0
 
+; we're done preparing, hide notification in 1s
 _fpquiUpdate("<delay>1000</delay>", $notifHandle)
 
 _mainLoop()
