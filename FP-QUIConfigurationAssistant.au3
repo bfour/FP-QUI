@@ -145,7 +145,6 @@ Func _save()
 	EndIf
 
 	_hideConfigurationAssistantGUI()
-;~ 	_promptForRestart()
 	_reinitCore()
 	_showTestQUI()
 
@@ -168,41 +167,9 @@ Func _reinitCore()
 EndFunc
 
 Func _showTestQUI()
-
-	Local $return
-
-	$return = _fpqui("<text>new configuration applied</text><ico>@ScriptDir\icon.ico</ico><replaceVars>1</replaceVars><delay>5000</delay><button><ID1><label>reconfigure</label><cmd>"&@ScriptFullPath&"</cmd></ID1></button>", Default, 1, _
+	_fpqui("<text>new configuration applied</text><ico>@ScriptDir\icon.ico</ico><replaceVars>1</replaceVars><delay>7000</delay><button><ID1><label>reconfigure</label><cmd>"&@ScriptFullPath&"</cmd></ID1></button>", Default, 1, _
 			"<coreNotRunning>tryAndReturn</coreNotRunning>")
-
-;~ 	If @error Then _error('Failed to create test-QUI: @error='&@error, 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
-	;TODO fix error (always returns 4 responseFailed)
-
 EndFunc
-
-;~ Func _promptForRestart()
-;~
-;~ 	If ProcessExists("FP-QUICore.exe") Then
-;~
-;~ 		Local $answer = MsgBox(4+32, "FP-QUIConfigurationAssistant", "New configuration has been saved to "&_iniFinalPath($globalConfigPath)&". In order for changes to take effect FP-QUICore has to be restarted. Current QUIs will be lost. Do you wish to restart FP-QUICore now?")
-;~
-;~ 		If $answer == 6 Then ; yes
-;~
-;~ 			Local $corePath = @ScriptDir&"\FP-QUICore.exe" ;TODO change to more secure method
-;~
-;~ 			If FileExists($corePath) == 0 Then
-;~ 				_error('Failed to find FP-QUICore executable at "'&$corePath&'". Restart aborted.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
-;~ 			Else
-;~ 				ProcessClose("FP-QUICore.exe")
-;~ 				Run($corePath)
-;~ 				If @error Then _error('Failed to start FP-QUICore. Please restart manually.', 1, $errorBroadCast, $errorLog, $errorLogDir, $errorLogFile, $errorLogMaxNumberOfLines, 1)
-;~ 			EndIf
-;~
-;~ 		EndIf
-;~
-;~ 	EndIf
-;~
-;~ EndFunc
-
 
 Func _mainLoop()
 
@@ -268,7 +235,7 @@ Func _mainLoop()
 		Else
 			GUICtrlSetData($fontInput, "Segoe UI")
 		EndIf
-		GUICtrlSetData($fontSizeInput, 16)
+		GUICtrlSetData($fontSizeInput, 14)
 		GUICtrlSetData($textColorInput, Default)
 
 	Case $heightDefaultButton
@@ -286,26 +253,6 @@ Func _mainLoop()
 	Case $saveButton
 		_save()
 		Exit
-
-;~ 	Case $colorsListBox
-;~ 		Local $selection = _GUICtrlListBox_GetCurSel($colorsListBox)
-;~
-;~ 		If $selection<>-1 Then
-;~ 			Local $colorValue = _GUICtrlListBox_GetItemData($colorsListBox, $selection)
-;~ 			GUICtrlSetData($colorsInput, $colorValue)
-;~ 		EndIf
-
-;~ 	Case $colorsInput
-
-
-;~ 	Case $colorsDefaultButton
-
-
-;~ 	Case $colorsSelectButton
-
-
-;~ 	Case $colorsSaveButton
-
 
 	EndSwitch
 
