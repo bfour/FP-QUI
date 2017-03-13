@@ -50,13 +50,13 @@ Func _fpquiDebug($string)
 EndFunc
 
 ; $args    ... arguments for FP-QUICore describing the notification to be displayed
-; $handle    ... handle to a previously created message which will
+; $GUID    ... GUID to a previously created message which will
 ;             then be updated with the given arguments
-; $createIfNotVisible   ... whether to create a new message if a handle is
+; $createIfNotVisible   ... whether to create a new message if a GUID is
 ;                     provided but the corresponding message is not visible
 ; $errorHandling       ... error handling parameters
 ; $returnPipeName       ... name
-Func _fpqui($args, $handle=Default, $createIfNotVisible=Default, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $receiveBlocking = Default)
+Func _fpqui($args, $GUID=Default, $createIfNotVisible=Default, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $receiveBlocking = Default)
 
    _fpquiDebug("_fpqui: method called")
 
@@ -82,45 +82,55 @@ Func _fpqui($args, $handle=Default, $createIfNotVisible=Default, $errorHandling=
    ;prepare return pipe
    If $returnPipeName 		== Default Then $returnPipeName 	= $FPQUI_DEFAULT_RETURNPIPE_NAME
    If $returnPipeHandle 	== Default Then
-	  If $FPQUI_DEFAULT_RETURNPIPE_HANDLE == "" Or $receiveBlocking <> $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY Then $FPQUI_DEFAULT_RETURNPIPE_HANDLE = _pipeCreate($returnPipeName, $receiveBlocking)
+	  _fpquidebug("$returnPipeHandle default")
+	  If $FPQUI_DEFAULT_RETURNPIPE_HANDLE == "" Or $receiveBlocking <> $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY Then
+		 $FPQUI_DEFAULT_RETURNPIPE_HANDLE = _pipeCreate($returnPipeName, $receiveBlocking)
+		 _fpquidebug("created pipe, new default ret pip handle: "&$FPQUI_DEFAULT_RETURNPIPE_HANDLE)
+	  EndIf
 	  $returnPipeHandle = $FPQUI_DEFAULT_RETURNPIPE_HANDLE
    EndIf
    $FPQUI_DEFAULT_RETURNPIPE_BLOCKING_MEMORY = $receiveBlocking
 
    _fpquiDebug("_fpqui/prepare return pipe done: $returnPipeName="&$returnPipeName&" $returnPipeHandle="&$returnPipeHandle)
 
-   ;check if handle is specified, if not create new QUI
-   If $handle == Default Then
-      _fpquiDebug("_fpqui/handle unspecified, creating new qui, $args="&$args)
-      $handle = _fpquiComm($args, _
+   ; parse args for update
+   Local $updateTag = _commandLineInterpreter($args, "update")
+   $updateTag = $updateTag[0][1]
+
+   ; check if GUID is specified, if not create new QUI
+   ; or pass raw args if this is an update
+   If $GUID == Default Or $updateTag <> "" Then
+      _fpquiDebug("_fpqui/GUID unspecified, creating new qui, $args="&$args)
+      $GUID = _fpquiComm($args, _
                $returnPipeName, $returnPipeHandle, _
+			   $GUID, _
                $corePath, $coreNotRunningHandling, _
                $sendMaxRetries, $sendRetryPause, $receiveBlocking, $receiveMaxRetries, $receiveRetryPause, _
                $requestFailedHandling, $responseFailedHandling)
-      Return SetError(@error,0,$handle)
+      Return SetError(@error,0,$GUID)
    EndIf
 
-   ;handle is specified
-   Local $argPrefix= "<winHandle>"& $handle &"</winHandle>"
+   ;GUID is specified
+   Local $argPrefix= "<GUID>"& $GUID &"</GUID>"
    If $createIfNotVisible<>"" Then $argPrefix &= "<createIfNotVisible>"& $createIfNotVisible &"</createIfNotVisible>"
    $args = $argPrefix & $args
 
-   _fpquiDebug("_fpqui/handle specified, updating, $argPrefix & $args="&$argPrefix & $args)
-   $handle = _fpquiComm($args, $returnPipeName, $returnPipeHandle, $corePath, $coreNotRunningHandling, $sendMaxRetries, $sendRetryPause, $receiveMaxRetries, $receiveRetryPause, $requestFailedHandling, $responseFailedHandling)
-   Return SetError(@error,0,$handle)
+   _fpquiDebug("_fpqui/GUID specified, updating, $argPrefix & $args="&$argPrefix & $args)
+   $GUID = _fpquiComm($args, $returnPipeName, $returnPipeHandle, $GUID, $corePath, $coreNotRunningHandling, $sendMaxRetries, $sendRetryPause, $receiveMaxRetries, $receiveRetryPause, $requestFailedHandling, $responseFailedHandling)
+   Return SetError(@error,0,$GUID)
 
 EndFunc
 
-Func _fpquiDelete($handle, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $corePath=Default)
-   Local $return = _fpqui("<delete>"&$handle&"</delete>", Default, "", $errorHandling, $returnPipeName, $returnPipeHandle)
+Func _fpquiDelete($guid, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $corePath=Default)
+   Local $return = _fpqui("<delete>"&$guid&"</delete>", Default, "", $errorHandling, $returnPipeName, $returnPipeHandle)
    Return SetError(@error, 0, $return)
 EndFunc
 
 ; incrementally update QUI by specifying the sub-elements with their new values
 ; (rather than specifying the entire QUI with all elements, including the ones which value remains the same)
-Func _fpquiUpdate($args, $handle, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $corePath=Default)
-   _fpquiDebug("_fpquiUpdate/$args="&$args&" $handle="&$handle)
-   Local $return = _fpqui("<update>"&$args&"<winHandle>"&$handle&"</winHandle></update>", Default, "", $errorHandling, $returnPipeName, $returnPipeHandle)
+Func _fpquiUpdate($args, $GUID, $errorHandling=Default, $returnPipeName=Default, $returnPipeHandle=Default, $corePath=Default)
+   _fpquiDebug("_fpquiUpdate/$args="&$args&" $GUID="&$GUID)
+   Local $return = _fpqui("<update>"&$args&"<GUID>"&$GUID&"</GUID></update>", $GUID, "", $errorHandling, $returnPipeName, $returnPipeHandle)
    Return SetError(@error, 0, $return)
 EndFunc
 
@@ -128,16 +138,17 @@ EndFunc
 ; (includes handling of case where QUICore is not running)
 Func _fpquiComm(ByRef $request, _
       $returnPipeName, $returnPipeHandle, _
+	  $GUID = Default, _
       $corePath=Default, $coreNotRunningHandling=Default, _
       $sendMaxRetries=Default, $sendRetryPause=Default, _
 	  $receiveBlocking = Default, $receiveMaxRetries=Default, $receiveRetryPause=Default, _
       $requestFailedHandling=Default, $responseFailedHandling=Default)
 
    _fpquiDebug("_fpquiComm/")
-   _fpquiDebug("_fpquiComm/ $args="&$request)
+   _fpquiDebug("_fpquiComm/ $args="&$request&", $GUID="&$GUID)
 
    If $coreNotRunningHandling    == Default Then $coreNotRunningHandling = "tryAndReturn"
-   If $sendMaxRetries            == Default Then $sendMaxRetries = 8
+   If $sendMaxRetries            == Default Then $sendMaxRetries = 18
    If $sendRetryPause            == Default Then $sendRetryPause = 86
    If $receiveBlocking           == Default Then $receiveBlocking = 0
    If $receiveMaxRetries         == Default Then $receiveMaxRetries = 18
@@ -154,6 +165,7 @@ Func _fpquiComm(ByRef $request, _
    If $receiveBlocking == 1 Then $receiveMaxRetries = 0
 
    Local $pipeReplyCode = "<reply><pipe>"&$returnPipeName&"</pipe></reply>"
+   If $GUID <> Default Then $pipeReplyCode = ""
 
 ;~    _fpquiDebug("_fpquiComm/$sendMaxRetries="&$sendMaxRetries)
 ;~    _fpquiDebug("_fpquiComm/$sendRetryPause="&$sendRetryPause)
@@ -207,6 +219,15 @@ Func _fpquiComm(ByRef $request, _
    _fpquiDebug("_fpquiComm/send request to core done")
 
    ; sending request via pipe went fine, receive the answer
+   ; but only if GUID not specified
+   ; - if a GUID has already been assigned, either the existing notification will be updated
+   ; or a new one will be created, which will be assigned that same GUID
+   ; - this greatly improves performance as we do not have to wait for a reply
+   If $GUID <> Default Then
+	  _fpquiDebug("_fpquiComm/GUID specified: skip receive")
+	  Return $GUID
+   EndIf
+
    _fpquiDebug("_fpquiComm/receive")
    Local $recv = ""
    Local $responseFailed = False

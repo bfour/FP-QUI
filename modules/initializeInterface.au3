@@ -24,10 +24,12 @@
 
 Func _initializeInterface()
 
-	Global Const $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system;noReposAfterHide"
+	Global Const $cmdLineDescriptorRequest="text;delay;textColor;width;height;bkColor;ico;onClick;untilProcessExists;untilProcessClose;noDouble;untilClick;beep;x;y;talk;font;fontSize;trans;focus;audio;replaceVar;avi;run;progress;button;winHandle;reply;dispatcherArea;startPos;direction;delete;update;createIfNotVisible;system;noReposAfterHide;GUID"
 	Global Const $numberOfOptions=UBound(StringSplit($cmdLineDescriptorRequest,";",3))
-	
-	Global Const $numberOfHandles=6
+
+	Global Const $numberOfHandles=7
+
+	Global Const $idxGUID = 6
 
 EndFunc
 

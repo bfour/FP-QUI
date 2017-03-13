@@ -31,6 +31,6 @@ Func _initializeNotificationsArrays()
 	; $notificationsOptionsData: eg. n,21: how often has sound been played
 	Global $notificationsOptionsData[1][$numberOfOptions]
 
-	Global $notificationsDeleteRequests[1] ; Array containing winHandles (/IDs) to be deleted. If a notification is closed a request is stored in this array. Once the main loop has finished, all notificationsArray-entries will be deleted according to this array. This avoids outOfBounds-Errors during the execution of the main loop, when a user generates a click-event that causes a notification to close
+	Global $notificationsDeleteRequests[1][2] ; 0 .. winhandle, 1 .. GUID; Array containing winHandles & GUIDS to be deleted. If a notification is closed a request is stored in this array. Once the main loop has finished, all notificationsArray-entries will be deleted according to this array. This avoids outOfBounds-Errors during the execution of the main loop, when a user generates a click-event that causes a notification to close
 
 EndFunc

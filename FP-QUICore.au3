@@ -137,6 +137,7 @@
 #include <WindowsConstants.au3>
 #include <Constants.au3>
 #Include <WinAPI.au3>
+#include <WinAPICom.au3>
 #Include <GuiAVI.au3>
 #include <GuiButton.au3>
 #include <GUIConstantsEx.au3>
@@ -393,37 +394,49 @@ Func _processRequest($requestString)
    ;go
    Local $reply=""
 
-   If $options[32][1]<>"" Then ; update
+   If $options[32][1]<>"" Then ; 32 ... update-tag -> not empty -> *incremental* update
 
-      _debug("process request: update")
+      _debug("process request: (incremental) update")
 
       ; we simply append the update without the "update" tags to the current requestString (options), to force an overwrite of the attributes to be updated
 
-      $winHandle = _commandLineInterpreter($options[32][1],"winHandle")
-      $winHandle = $winHandle[0][1]
+      Local $instructions = _commandLineInterpreter($options[32][1],"winHandle;GUID")
+      Local $winHandle = $instructions[0][1] ; deprecated
+	   Local $guid =  $instructions[1][1]
 
 ;TODO: maybe we should return this error message via stdout or wmcopydata if applicable
-      If $winHandle == "" Then
-         _logError('You did not specify a winHandle within your update request: "'&$options[32][1]&'"',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)
+      If $winHandle == "" And $guid == "" Then
+         _logError('You did not specify a winHandle (deprecated) or GUID in your update request: "'&$options[32][1]&'"',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogFile,$errorLogMaxNumberOfLines,1)
          SetError(1)
          Return ""
       EndIf
 
-      Local $ID=_handleToID($winHandle)
+      Local $ID
+	  If $guid <> "" Then
+		 $ID = _guidToID($guid)
+	  Else
+		 $ID = _handleToID($winHandle)
+	  EndIf
+	  _debug("process request: (incremental) update: ID is "&$ID&" for GUID "&$guid)
 
+	  ; copy current options of the notification to be updated into an array
       Local $currentRequestArray[UBound($notificationsOptions,2)]
       For $i=0 To UBound($currentRequestArray)-1
          $currentRequestArray[$i]=$notificationsOptions[$ID][$i]
       Next
 
-      Local $currentRequestString=_optionsArrayToString($currentRequestArray)
+	  ; convert this array to a string (which represents the request/description initially received for this notification)
+      Local $currentRequestString = _optionsArrayToString($currentRequestArray)
 
-      $requestString = _commandLineInterpreter($requestString,"update")
-      $requestString = $requestString[0][1]
+      ; parse the update-request (request within update tags)
+      $instructions = _commandLineInterpreter($requestString,"update;reply")
+      Local $updateRequestString = $instructions[0][1]
+      Local $reply = $instructions[1][1]
 
-	  _debug($currentRequestString &"#########"& $requestString&@LF)
-
-      _processRequest($currentRequestString & $requestString)
+      ; NB: we also need to append the reply options, otherwise if in the previous request eg. a reply pipe has
+      ; been specified, that previous reply option would be kept
+	   _debug($currentRequestString &"#########"& $updateRequestString&"<reply>"&$reply&"</reply>"&@LF)
+      _processRequest($currentRequestString & $updateRequestString & "<reply>" & $reply & "</reply>")
 
       ;this time we do not want to send a reply (this has already been done in the function-call above if specified)
       $options[27][1]=""
@@ -432,12 +445,26 @@ Func _processRequest($requestString)
 
       _debug("process request: delete")
 
-      Local $ID=_handleToID($options[31][1])
+      Local $ID = _guidToID($options[31][1])
       If Not @error Then _hideNotification($ID)
 
-      $reply=$options[31][1]
+      $reply=$options[31][1] ; reply with GUID
 
-   ElseIf $options[26][1] <> "" Then ;winHandle<>"" --> update notif
+   ElseIf $options[36][1] <> "" Then ; GUID<>"" -> replace/update notif
+
+	  _debug("process request/update GUID specified/start")
+
+      ;if this notification is visible (and exists) simply do an update
+      If _notificationVisibleByGUID($options[36][1])==1 Then ; options[36][1] ... GUID
+         _updateNotification($options)
+         $reply=$options[36][1] ; reply = GUID
+      ;else
+      ElseIf $options[33][1]<>"" Then ; createIfNotVisible
+         Local $return = _processGenerateNotificationRequest($requestString, $options)
+         $reply = $notificationsHandles[$return[0]][$idxGUID] ; return[0] ... ID, reply = GUID
+      EndIf
+
+   ElseIf $options[26][1] <> "" Then ; deprecated; winHandle<>"" --> replace/update notif
 
 	  _debug("process request/update winhandle specified/start")
 
@@ -448,10 +475,8 @@ Func _processRequest($requestString)
       ;else
       ElseIf $options[33][1]<>"" Then ;createIfNotVisible
          Local $return=_processGenerateNotificationRequest($requestString,$options)
-         $reply=$notificationsHandles[$return[0]][0] ;return[0] ... ID
+         $reply=$notificationsHandles[$return[0]][0] ; return[0] ... ID, reply = winhandle
       EndIf
-
-;~ _debug("process request/update winhandle specified/end")
 
    ElseIf $options[34][1]<>"" Then ; system
 
@@ -478,7 +503,7 @@ Func _processRequest($requestString)
    Else ;generate notif
 
       Local $return=_processGenerateNotificationRequest($requestString,$options)
-      $reply=$notificationsHandles[$return[0]][0] ;return[0] ... ID
+      $reply = $notificationsHandles[$return[0]][$idxGUID] ; return[0] ... ID, reply = GUID
 
    EndIf
 
@@ -491,6 +516,7 @@ Func _processRequest($requestString)
 
 	  ;via pipe
 	If $replyPipe<>"" Then
+	   _debug("reply via pipe")
 		;try once (we have to be quick, this is one single thread)
 		If _pipeSend($replyPipe,$reply,0) <> 1 Then
 		    _debug("process request/reply failed to pipe "&$replyPipe&" with reply "&$reply&", calling intracom")
@@ -501,6 +527,7 @@ Func _processRequest($requestString)
 
       ; via wmcdhandle
    If $replyCDHandle<>"" Then
+      _debug("reply via wmcopydata")
       ; try once (we have to be quick, this is one single thread)
       If wmCopyDataSend($replyCDHandle, $reply) <> 1 Then
          ;if that doesn't work, delegate this task to another process (this one shall not be interrupted)
@@ -516,7 +543,7 @@ EndFunc
 ;interprets a request for generating a new notification (for instance, checks whether the signature exists and is relevant)
 ;in:  $requestString,$options
 ;out: [0: ID of the newly created or already existing notification, 1: 1...already existed 0...was unique]
-Func _processGenerateNotificationRequest($requestString,$options)
+Func _processGenerateNotificationRequest($requestString, $options)
 
    _debug("process request/generate")
    Local $returnArray[2]
@@ -529,8 +556,8 @@ Func _processGenerateNotificationRequest($requestString,$options)
    ;if no need for not-double or no double found
    If $noDouble=="" Or $ID==-1 Then
 
-      $ID=_generateNotification()
-      _updateNotification($options,$notificationsHandles[$ID][0])
+      $ID=_generateNotification($options[36][1]) ; pass GUID (is empty if not specified)
+      _updateNotification($options,$notificationsHandles[$ID][$idxGUID])
       _showNotification($ID)
 
       $returnArray[1] = 0 ;did not already exist
@@ -554,7 +581,7 @@ Func _GUISecondaryUpClick()
    _GUIClick("secondaryUp",@GUI_WinHandle)
 EndFunc
 
-Func _GUIClick($type,$winHandle)
+Func _GUIClick($type, $winHandle)
 
 ;~ _debug("GUIClick: $type="&$type&" $winHandle="&$winHandle)
 ;~ _debug("notif handles array ubound="&UBound($notificationsHandles))
@@ -642,19 +669,21 @@ Func _generateDispatcherWindow()
 
 EndFunc
 
-;generates window and empty array-entrys (-->ID)
-;return: ID
-Func _generateNotification()
+; generates window and empty array-entrys (-->ID)
+; $GUID ... GUID to use for this notification (if this re-creates a previously referenced notification)
+; return: ID
+Func _generateNotification($GUID = "")
 
    ;register notification
    ReDim $notificationsHandles[UBound($notificationsHandles)+1][$numberOfHandles]
    ReDim $notificationsOptions[UBound($notificationsOptions)+1][$numberOfOptions]
    ReDim $notificationsOptionsData[UBound($notificationsOptionsData)+1][$numberOfOptions]
 
-   Local $ID=UBound($notificationsHandles)-1
+   ; get id
+   ; the ID is the array index of the $notificationsHandles-array
+   Local $ID = UBound($notificationsHandles)-1
 
-
-   ;set this startpos to opposite corner of start pos (ie: bottomright --> topleft)
+   ; set this startpos to opposite corner of start pos (ie: bottomright --> topleft)
    Local $x=0
    Local $y=0
 
@@ -670,7 +699,6 @@ Func _generateNotification()
       $y=0
    EndIf
 
-
    ;generate GUI
    Local $winHandle=GUICreate("FP-QUI/child_"&$ID,$x,$y,0,0,-2147483648,136,$dispatcherWindow)
    WinSetTitle($winHandle,"","FP-QUI/child_"&$winHandle)
@@ -679,29 +707,28 @@ Func _generateNotification()
    GUISetOnEvent($GUI_EVENT_PRIMARYUP,"_GUIPrimaryUpClick",$winHandle)
    GUISetOnEvent($GUI_EVENT_SECONDARYUP,"_GUISecondaryUpClick",$winHandle)
 
-   ;save GUI handle
-   $notificationsHandles[$ID][0]=$winHandle
+   ;save GUI handle and GUID
+   $notificationsHandles[$ID][0] = $winHandle
+   If $GUID == "" Then
+	  $notificationsHandles[$ID][$idxGUID] = _WinAPI_CreateGUID()
+   Else
+	  $notificationsHandles[$ID][$idxGUID] = $GUID
+   EndIf
 
    Return $ID
 
 EndFunc
 
-Func _updateNotification($options,$handle=Default)
+Func _updateNotification($options, $guid = Default)
 
-_debug("start update func")
+   _debug("start update func")
 
-   ;which notification?
-   Local $winHandle
-   If $handle==Default Then
-      $winHandle=$options[26][1]
-   Else
-      $winHandle=$handle
-   EndIf
+   If $guid == Default Then $guid = $options[36][1]
 
-   Local $ID=_handleToID($winHandle)
+   Local $ID = _guidToID($guid)
 
-   ; replace myHandle
-   _replaceMyHandle($options, $winHandle) ; by ref!
+   ; replace %myGUID% in options with given GUID
+   _replaceMyGUID($options, $guid) ; by ref!
 
    If $ID<>0 Then ;else invalid handle --> invalid ID
 
@@ -737,8 +764,7 @@ _debug("store options start")
          $bkColor=$options[5][1]
       EndIf
 
-      Switch $options[5][1]
-
+      Switch $bkColor
          Case "blue"
             $bkColor=$colorsBlue
          Case "green"
@@ -836,7 +862,7 @@ _debug("store options end, prepare handles start")
 
       ;prepare handles
 
-      ;notificationsHandles: [0: GUI-Handle, 1: ico-Handle, 2: avi-Handle, 3: label-Handle, 4: progress-Handle, 5: button-handles (<1>handle</1> etc.)
+      ;notificationsHandles: [0: GUI-Handle, 1: ico-Handle, 2: avi-Handle, 3: label-Handle, 4: progress-Handle, 5: button-handles (<1>handle</1> etc.), 6: GUID
 
       Local $labelHandle=""
       If $text<>"" Then
@@ -1233,7 +1259,8 @@ EndFunc
 
 Func _hideNotification($ID)
 
-   Local $winHandle=$notificationsHandles[$ID][0]
+   Local $winHandle = $notificationsHandles[$ID][0]
+   Local $guid = $notificationsHandles[$ID][$idxGUID]
 
    If $ID<>"" And $winHandle<>"" Then
    ;~    DllCall("user32.dll","int","AnimateWindow","hwnd",$winHandle,"int",100,"long",0x00050004);slide-out to bottom
@@ -1258,8 +1285,9 @@ Func _hideNotification($ID)
 	  If $notificationsOptions[$ID][35]=="" Then _repositionAll()
 
       ;add a delete request
-      ReDim $notificationsDeleteRequests[UBound($notificationsDeleteRequests)+1]
-      $notificationsDeleteRequests[UBound($notificationsDeleteRequests)-1]=$winHandle
+      ReDim $notificationsDeleteRequests[UBound($notificationsDeleteRequests)+1][2]
+      $notificationsDeleteRequests[UBound($notificationsDeleteRequests)-1][0] = $winHandle
+	  $notificationsDeleteRequests[UBound($notificationsDeleteRequests)-1][1] = $guid
 
    EndIf
 
@@ -1283,13 +1311,13 @@ Func _processNotificationsDeleteRequests()
 
    For $i=1 To UBound($deleteRequest)-1
 
-      Local $ID=_handleToID($deleteRequest[$i])
+      Local $ID=_guidToID($deleteRequest[$i][1])
 
 
       If $ID <> "" Then
 
          ; delete GUI
-         GUIDelete($deleteRequest[$i])
+         GUIDelete($deleteRequest[$i][0])
 
          ; close sound handle (if there's none this will simply fail)
          _SoundClose($notificationsOptionsData[$ID][21])
@@ -1315,12 +1343,12 @@ Func _processNotificationsDeleteRequests()
                ContinueLoop
             ;else, an error has occured, since we haven't yet deleted the entry
             Else
-               _logError('something is wrong here: could not remove delete request "'&$deleteRequest[$i]&'" from requestArray, while deleting the other array entries seems to have been successful',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogfile,$errorLogMaxNumberOfLines)
+               _logError('something is wrong here: could not remove delete request "'&$deleteRequest[$i][1]&'" from requestArray, while deleting the other array entries seems to have been successful',$errorInteractive,$errorBroadcast,$errorLog,$errorLogDir,$errorLogfile,$errorLogMaxNumberOfLines)
             EndIf
          EndIf
 
-         If $notificationsDeleteRequests[$j]==$deleteRequest[$i] Then
-            _ArrayDelete($notificationsDeleteRequests,$j)
+         If $notificationsDeleteRequests[$j][1] == $deleteRequest[$i][1] Then ; compare GUIDs
+            _ArrayDelete($notificationsDeleteRequests, $j)
             ExitLoop
          EndIf
 

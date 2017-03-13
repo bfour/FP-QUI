@@ -28,27 +28,51 @@ Func _handleToID($handle)
 	Next
 	SetError(1)
 	Return ""
-
 EndFunc
+
+; searches for GUID in $notificationsHandles, returns first array-index with match
+; returns "" and sets @error to 1 if handle not found
+Func _guidToID($GUID)
+	For $i=1 To UBound($notificationsHandles)-1
+		If $notificationsHandles[$i][$idxGUID] == $GUID Then Return $i
+	Next
+	SetError(1)
+	Return ""
+Endfunc
 
 ;returns 0 or 1
 Func _notificationVisible($handle)
 
 	If _handleToID($handle)=="" Then
+	   ; the ID does not correspond to a handle anymore
+      ; ie. the notification has been deleted -> not visible
 		Return 0
 	Else
-
 		;we have to check whether the notification is in the delete queue, if so, it's not visible anymore
 		For $i=1 To UBound($notificationsDeleteRequests)-1
-			If $notificationsDeleteRequests[$i] == $handle Then Return 0
+			If $notificationsDeleteRequests[$i][0] == $handle Then Return 0
 		Next
-
 		Return 1
-
 	EndIf
 
 EndFunc
 
+;returns 0 or 1
+Func _notificationVisibleByGUID($GUID)
+
+	If _guidToID($GUID)=="" Then
+	   ; the ID does not correspond to a GUID anymore
+      ; ie. the notification has been deleted -> not visible
+		Return 0
+	Else
+		;we have to check whether the notification is in the delete queue, if so, it's not visible anymore
+		For $i=1 To UBound($notificationsDeleteRequests)-1
+			If $notificationsDeleteRequests[$i][1] == $GUID Then Return 0
+		Next
+		Return 1
+	EndIf
+
+EndFunc
 
 ;looks for an notification with the same signature
 ;in: 	options (signature)
@@ -121,12 +145,26 @@ Func _replaceVar(ByRef $options)
 
 EndFunc
 
-Func _replaceMyHandle(ByRef $options, $myHandle)
+; replaces any occurrence of %myHandle% in options array with given handle
+; unless replaceVar option is 0
+Func _replaceMyHandle(ByRef $options, $handle)
 
-	If $options[21][1]=="0" Then Return
+	If $options[21][1]=="0" Then Return ; 21 ... replaceVar ... whether to replace variables
 
 	For $i=0 To UBound($options)-1
-		$options[$i][1] = StringReplace($options[$i][1],"%myHandle%",$myHandle)
+		$options[$i][1] = StringReplace($options[$i][1],"%myHandle%",$handle)
+	Next
+
+EndFunc
+
+; replaces any occurrence of %myGUID% in options array with given GUID
+; unless replaceVar option is 0
+Func _replaceMyGUID(ByRef $options, $guid)
+
+	If $options[21][1]=="0" Then Return ; 21 ... replaceVar ... whether to replace variables
+
+	For $i=0 To UBound($options)-1
+		$options[$i][1] = StringReplace($options[$i][1], "%myGUID%", $guid)
 	Next
 
 EndFunc
