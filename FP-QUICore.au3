@@ -334,13 +334,9 @@ Func _main()
        ; <check display update>
 ;~ ConsoleWrite($cycleCounter)
       If Mod($cycleCounter, 30) == 0 Then
-          Local $currentHash = _displayGetPosHash()
-         Local $currentTaskbarHash = _taskbarGetPosHash()
-;~ _debug("last taskbhash: "&   $currentTaskbarHash)
-         If $lastDisplayHash <> $currentHash Or $lastTaskbarHash <> $currentTaskbarHash Then
-            $lastDisplayHash = $currentHash
-            $lastTaskbarHash = $currentTaskbarHash
-            $dispatcherArea = _getDispatcherArea()
+         Local $change = _dispatcherAreaHasChanged()
+         If $change <> False Then
+            $dispatcherArea = $change
             _debug("display changed, new disp area: "&$dispatcherArea[0]&","&$dispatcherArea[1]&","&$dispatcherArea[2]&","&$dispatcherArea[3]&@LF)
             WinMove($dispatcherWindow, "", $dispatcherArea[0], $dispatcherArea[1], $dispatcherArea[2], $dispatcherArea[3], 1)
             _repositionAll()
