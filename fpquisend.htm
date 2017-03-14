@@ -1,11 +1,36 @@
 <html lang=ru><body><pre>                                    
 fpquisend Copyright(c) Alexey Kuryakin, 2017 &lt;kouriakine@mail.ru&gt;.
 fpquisend - program to send message WM_COPYDATA to FP-QUI process.
+Data to send may come from stdin or may be specified as parameter.
 FP-QUI is nice tooltip notification system made by Florian Pollak.
 FP-QUI Copyright(c) 2010-2017 Florian Pollak (bfourdev@gmail.com).
-Usage:
- 1) Args: fpquisend "&lt;text&gt;Hello world.&lt;/text&gt;"
- 2) Pipe: cmd /c echo "&lt;text&gt;Hello world.&lt;/text&gt;" | fpquisend
- 3) Help: fpquisend --help 
+Usage: 
+ fpquisend [-o [p]] [d]
+ -o - option identifier
+ p  - option parameter
+ d  - data to send
+Options:
+ -h, --help     - show help screen
+ -v, --verbose  - set verbose mode
+ -b, --binary   - set binary  mode
+ -c, --class c  - set window class c
+ -t, --title t  - set window title t
+ -e, --exe   f  - set exe filename f
+ -m, --magic n  - set magic number n
+ -d, --data  d  - set data to send d
+ -l, --log   l  - set log filename l
+Exit codes:
+ 0 - data sent successfully
+ 1 - target window not found
+ 2 - unexpected exe filename
+ 3 - nothing to send, i.e. empty data
+ 4 - send operation failed or refused
+ 5 - invalid parameters was specified
+ 6 - general fault
+Examples:
+ 1) Help: fpquisend --help 
+ 2) Args: fpquisend "&lt;text&gt;Hello world.&lt;/text&gt;"
+ 3) Pipe: cmd /c echo "&lt;text&gt;Hello world.&lt;/text&gt;" | fpquisend
+ 4) Logs: fpquisend -v -l %temp%\fpquisend.log "&lt;text&gt;Hello world.&lt;/text&gt;"
 
 </pre></body></html>                                         

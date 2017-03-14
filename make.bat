@@ -4,7 +4,11 @@ SetLocal EnableExtensions EnableDelayedExpansion
 rem Use DCC32 compiler
 
 :Main
-for %%x in ( fpquisend ) do call :CompileProg %%x
+call :DeleteFiles fpquisendw.res fpquisendw.dsk fpquisendw.cfg fpquisendw.dof fpquisendw.dpr
+copy /y fpquisend.res fpquisendw.res >nul & type fpquisend.dpr | findstr /V "{$APPTYPE CONSOLE}" > fpquisendw.dpr
+for %%x in ( fpquisend fpquisendw ) do call :CompileProg %%x
+call :DeleteFiles fpquisendw.res fpquisendw.dsk fpquisendw.cfg fpquisendw.dof fpquisendw.dpr
+fpquisend -h > fpquisend.txt & unix txt2htm fpquisend.txt >nul
 goto :EOF
 
 :CompileProg
@@ -30,4 +34,8 @@ unix tooltip-notifier text "%~1" preset stdError delay 15000
 echo Failure: %~1
 goto :EOF
 
-
+:DeleteFiles
+if "%~1" == "" goto :EOF
+if exist "%~1" del /F "%~1"
+shift & goto DeleteFiles
+goto :EOF
