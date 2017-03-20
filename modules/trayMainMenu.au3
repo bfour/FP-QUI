@@ -36,7 +36,7 @@ EndFunc
 
 Func _trayMainMenuHelp()
    _debug("_trayMainMenuHelp")
-   ShellExecute(@ScriptDir&"\docs\documentation\documentation.html", "", "", "open")
+   ShellExecute(@ScriptDir&"\docs\documentation.html", "", "", "open")
 EndFunc
 
 Func _trayMainMenuConfigure()
