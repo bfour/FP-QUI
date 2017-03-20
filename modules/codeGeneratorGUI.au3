@@ -25,7 +25,7 @@
 #include <WindowsConstants.au3>
 
 #Region ### START Koda GUI section ### Form=s:\sabox\grid\fp-qui\gui\codegeneratorgui.kxf
-$codeGeneratorGUI = GUICreate("FP-QuinterfaceCodeGeneratorGUI", 701, 481, -1, -1)
+$codeGeneratorGUI = GUICreate("FP-QUICodeGeneratorGUI", 701, 481, -1, -1)
 $Tab1 = GUICtrlCreateTab(8, 8, 683, 361)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH+$GUI_DOCKHEIGHT)
 $TabSheet1 = GUICtrlCreateTabItem("Visuals")
