@@ -18,30 +18,41 @@
 
 #cs ----------------------------------------------------------------------------
 
- If FP-QUI is started without any command line parameters, it shall run in the background and provide a dispatcher window.
- Invokes for new notifications can be send via a wm_copydata, using the same command line sytanx as for the executable itself.
- If FP-QUI is started with command line paramters and no other instance is running, FP-QUI shall run in the background, provide a dispatcher window and send the parameters to itself.
+ If FP-QUICore is started without any command line parameters, it shall run
+ in the background and provide a dispatcher window. Invokes for new notifications
+ can be sent via named pipe or wm_copydata, using the same command line sytanx
+ as for the executable itself. If FP-QUICore is started with command line paramters
+ and no other instance is running, FP-QUICore shall run in the background,
+ provide a dispatcher window and send the parameters to itself.
 
  exe --|
-       |---> (FP-QUIInterface) ---> FP-QUI, dispatcher window, notification
+       |---> (FP-QUI) ---> FP-QUICore, dispatcher window, notification
  cmd --|
 
-
- In order for an external application to interact with an existing notification, you may provide a specific window-handle as a parameter (just insert <winHandle>[handle]</winHandle> anywhere in your CL params-string).
- When creating a new notification, the window handle is returned
-   1.) via stdout
-   2.) via wm_copydata
-
+ In order for an external application to interact with an existing notification,
+ you may provide its GUID as a parameter (just insert <GUID>{xxxx-xxxx-xxxx-xxxx}</GUID>
+ anywhere in your CL params-string). When creating a new notification, the GUID is
+ returned via stdout, wm_copydata or named pipe depending on what has been specified
+ in the <reply>-tags in your request.
 
  features and commandLineDescriptors:
 
  0 <text>
+   text to be displayed in the notification
  1 <delay>
+   time in milliseconds until the notification disappears;
+   leave empty for infinity
  2 <textColor>
+   colour of the text
  3 <width>
+   width of the notification in pixels
+   this setting might be ignored by FP-QUICore
  4 <height>
+   height of the notification in pixels
+   this setting might be ignored by FP-QUICore
  5 <bkColor>
-   0x****** color-code
+   background colour of the notification
+   0x****** hex color-code
    blue
    green
    red
@@ -52,38 +63,75 @@
    purple
    yellow
  6 <ico>
+   path to an icon file
+   the icon will be displayed in the notification
  7 <onClick>
    <any> ... on any click
    <left> ... on left mouse button
    <right> ... on right mouse button
    <includeButton> ... process clicks on button, too
-   you may enclose commands in <shellOpen> (shell execute, verb: open) or <internal> (nested notification commands)
+   you may enclose commands in <shellOpen> (shell execute, verb: open) or <internal>
+   (nested notification commands)
  8 <untilProcessExists>
+   display this notification until the specified process appears;
+   you may specify the process name or PID;
+   FP-QUICore will look for the given process every few ms, however,
+   if the specified process appears and disappears too quickly its appearance
+   might not be detected
  9 <untilProcessClose>
- 10 <noDouble> ... if <>"", a notification will only be genereated if its signature (cmd-params) is unique. If it is not, the handle of the existing notification with the same signature will be returned (there can't be many, since they would all need at least noDouble<>"" to be equal,).
+   same as <untilProcessExists> but looks for process to disappear rather than appear
+ 10 <noDouble>
+    If <>"", a notification will only be genereated if its signature (cmd-params)
+    is unique, ie. a new notification will not be generated if there is another
+    visible notification with the same options/parameters as in this request
+    (only the values are compared, not their order).
+    If another notification already exists, the GUID of the existing notification
+    with the same signature will be returned (there should only be one, as it
+    will also have noDouble set).
  11 <untilClick>
-      <any> ... on any click
-      <prim> ... on left mouse button
-      <sec> ... on right mouse button
-      <includeButton> ... process clicks on button, too
+      <any> ... if the contents of this tag are <>"", the notification will
+                hide on any click
+      <prim> ... if the contents of this tag are <>"", the notification will
+                 hide on primary (left) mouse button
+      <sec> ... if the contents of this tag are <>"", the notification will
+                hide on secondary (right) mouse button
+      <includeButton> ... if the contents of this tag are <>"",
+                          clicks on buttons of this notification may
+                          hide this notification depending on what has been
+                          set in <any>, <prim> and <sec>
  12 <beep>
+    play an onboard-beep sequence with this notification
       <string> ... freq;duration|freq;duration|...
       <repeat> ... number of repetitions
-      <pause> ... pause between repeats
-      <shake> ... shake notification on beep
+      <pause> ... pause between repeats in ms
+      <shake> ... if <>"" shake notification on beep
  13 <x>
+    fixed x-coordinate for this notification
+    this option might be ignored by FP-QUICore
  14 <y>
+    fixed y-coordinate for this notification
+    this option might be ignored by FP-QUICore
  15 <talk>
-      [string] and nothing else
-      <string>string</string>
-      <repeat>number or "" for infinity</repeat>
-      <pause>pause between talk</pause>
-      use %text% as string to say what's enclosed in <text>
-
+    This can be used to generate text-to-speech output. Just
+    write the text to be spoken by the Windows Speech API within the
+    <talk>-tags, or use:
+    <string>string</string>
+    <repeat>number or "" for infinity</repeat>
+    <pause>pause between talk</pause>
+    use the variable %text% to refer to the text in <text>
  16 <font>
+    The font to be used in this notification (otherwise the default as
+    specified in the config is used).
  17 <fontSize>
+    The font size to be used in this notification (otherwise the default as
+    specified in the config is used).
  18 <trans> transparency
- 19 <focus> grabs focus if <>""
+    The transparency to be used in this notification (otherwise the default as
+    specified in the config is used).
+    This is an integer value between 0 and 255.
+ 19 <focus>
+    grabs window focus if <>"" (ie. the notification will become the foreground
+    window when it appears)
  20 <audio> plays back an audio-file
       <path> ... path to sound file
       <repeat> ... number of repetitions
@@ -91,43 +139,64 @@
       <maxVol> ... maximize volume before playback
       <overwriteMute> ... overwrites mute
       <shake> ... shake notification on playback
- 21 <replaceVar> if <>"" variables in all options will be replaced by _stringReplaceVariables
- 22 <avi> path to show specific avi, empty to show no avi
+ 21 <replaceVar>
+    if <>"" variables in all options will be replaced by _stringReplaceVariables
+ 22 <avi>
+    path to show specific avi, empty to show no avi
  23 <run>
-      <cmd> ... you may enclose a command in <shellOpen> (shell execute, verb: open) or <internal> (nested notification commands)
-      <repeat>
-      <pause>
- 24 <progress> ... <>"" --> show bar
+      <cmd> ... you may enclose a command in <shellOpen> (shell execute, verb: open)
+                or <internal> (nested notification commands)
+      <repeat> ... repeat this command
+      <pause> ... wait x ms before executing the command again
+ 24 <progress>
+    value between 0 and 100 to be represented in a progress bar
  25 <button>
       one button: <button><1><label>test</label><cmd>notepad</cmd></1></button>
-      three buttons:    <button>
+      three buttons: <button>
                      <a><label>test</label><cmd>notepad</cmd></a>
                      <d><label>test2</label><cmd>notepad</cmd></d>
                      <third><label>test3</label><cmd>notepad</cmd></third>
                   </button>
-      you may enclose commands in <shellOpen> (shell execute, verb: open) or <internal> (nested notification commands)
+      you may enclose commands in <shellOpen> (shell execute, verb: open) or
+      <internal> (nested notification commands)
  26 <winHandle>
  27 <reply>
 	  <pipe> set to <>"" and provide a valid pipe name if you want a reply via named pipe
-      <wmcopydataHandle> set to <>"" and provide a valid window handle if you want a wmcopydata reply
-      <stdout> set to <>"" if you want an stdout reply
+     <wmcopydataHandle> set to <>"" and provide a valid window handle if you want a wmcopydata reply
+     <stdout> set to <>"" if you want an stdout reply
  28 <dispatcherArea> ... overwrite config; [screen1|screen2|screen3 …|x,y,width,height]
- 29 <startPos> ... overwrite config; [upperleft|upperright|lowerleft|lowerright|x,y] … relative to dispatcherArea
- 30 <direction> ... overwrite config; [down,right|down,left|up,right|up,left] … relative to startPos
- 31 <delete> ... deletes winHandle, all other arguments are ignored (.exe <delete>0x000000</delete>)
- 32 <update> ... if you want to explicitly declare an update (else any request with <winHandle> <> "" will force an update of all attributes of this notification according to the parameters you provided) you may enclose your request in <update> (<update>[request]</update>)
- 33 <createIfNotVisible> ...    <>"": If you update a notification declaring a winhandle and it's not visible this will automatically fall back to creating a new one. This will not work with update, since only part of the signature of the notification is provided (doesn't make sense).
-                        =="" (default): no auto create
-34 <system>
-   multiple instructions are allowed at the same time:
-   <menu>             ... <>"" --> show menu if not yet visible
-   <reinitDefaults>    ... <>"" --> reinitialize defaults
-   <reinitBehaviour>    ... <>"" --> reinitialize behaviour
-   <reinitColors>       ... <>"" --> reinitialize colors
-
-35 <noReposAfterHide>
-   if <>"" -> inhibit reposition after this QUI has been hidden (by any event)
-   increases performance and should be used if it is certain that other deletes will follow this one
+ 29 <startPos>
+    overwrite config; [upperleft|upperright|lowerleft|lowerright|x,y] … relative to dispatcherArea
+ 30 <direction>
+    overwrite config; [down,right|down,left|up,right|up,left] … relative to startPos
+ 31 <delete>
+    deletes the notification with the specified GUID,
+    all other arguments are ignored (eg. <delete>{xxxx-xxxx-xxxx-xxxx}</delete>)
+ 32 <update>
+    this declares an incremental update and contains the parameters to be updated
+    eg.: <update><text>new text</text><GUID>{xxxx-xxxx-xxxx-xxxx}</GUID></update> will
+    update the notification with the given GUID by changing its current text to "new text"
+    (else any request with <GUID> <> "" will force an update of all attributes
+    of the corresponding notification according to the parameters you provided)
+ 33 <createIfNotVisible>
+    if <>"": If you update a notification declaring a GUID and it's not visible this
+    will automatically fall back to creating a new one. This will not work with update,
+    since only part of the signature of the notification is provided.
+    if =="" (default): no auto-create
+ 34 <system>
+    multiple instructions are allowed at the same time:
+    <menu>             ... <>"" --> show menu if not yet visible
+    <reinitDefaults>    ... <>"" --> reinitialize defaults
+    <reinitBehaviour>    ... <>"" --> reinitialize behaviour
+    <reinitColors>       ... <>"" --> reinitialize colors
+ 35 <noReposAfterHide>
+    if <>"" -> inhibit reposition after this QUI has been hidden (by any event)
+    increases performance and should be used if it is certain that other deletes will follow this one
+ 36 <GUID>
+    if <>"": parameters set in this request shall replace the ones of the
+    corresponding existing notification with this GUID
+    if there's no visible notification with this GUID,
+    this request will be ignored unless <createIfNotVisible> is set to <>""
 
    example: <update><winHandle>0x000000</winHandle><text>hello :-)</text></update> will change the text of 0x000000, but will leave all other attributes unchanged
 
