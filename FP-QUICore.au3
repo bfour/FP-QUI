@@ -245,7 +245,7 @@
 #include "modules\firstStartHandling.au3"
 
 #include "modules\setBehaviour.au3"
-#include "modules\mainMenu.au3"
+#include "modules\splashNotification.au3"
 #include "modules\trayMainMenu.au3"
 
 ;+++ Alex Kuryakin
@@ -296,9 +296,7 @@ Func _start()
          _debug("command line is empty")
 
          If $behaviourShowMenuOnNoArguments==1 Then
-            _debug("calling mainMenu")
-            _mainMenu(1)
-            _debug("calling mainMenu done")
+            _splashNotification(1)
          Else
             Exit
          EndIf
@@ -320,7 +318,7 @@ Func _start()
 
 ;~       DllCall("psapi.dll","int","EmptyWorkingSet","long",-1) ;reduce memory consumption
 
-      If $behaviourShowMenuOnFirstStart==1 Then _mainMenu()
+      If $behaviourShowMenuOnFirstStart==1 Then _splashNotification()
       If $CmdLineRaw<>"" Then _processRequest($CmdLineRaw)
 
       _main()
@@ -552,7 +550,7 @@ Func _processRequest($requestString)
          Switch $instructions[$j][0]
 
          Case "menu"
-            If $instructions[$j][1] <> "" Then _mainMenu(0)
+            If $instructions[$j][1] <> "" Then _splashNotification(0)
          Case "reinitDefaults"
             If $instructions[$j][1] <> "" Then _initializeDefaults()
          Case "reinitBehaviour"
