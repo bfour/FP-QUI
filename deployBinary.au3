@@ -24,8 +24,7 @@ FileCopy($appPath&"\data\config_global.ini",$basePath&"\data\config_global.ini",
 _setDefaultConfig($basePath&"\data\config_global.ini")
 
 ;documentation
-FileCopy($appPath&"\docs\documentation\documentation.html",$basePath&"\docs\documentation\documentation.html",8)
-FileCopy($appPath&"\docs\documentation\images\*.*",$basePath&"\docs\documentation\images\",8)
+FileCopy($appPath&"\docs\documentation.html", $basePath&"\docs\documentation.html",8)
 
 ;tools
 FileCopy($appPath&"\tools\*.exe",$basePath&"\tools\",8)
