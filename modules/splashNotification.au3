@@ -39,18 +39,6 @@ Func _splashNotification($inhibitInternal=Default)
 	$code &= "</button>"
 	$code &= "<untilClick><any>1</any><includeButton>1</includeButton></untilClick>"
 
-;~ 	    local $btn1 = "Help"
-;~     local $btn2 = "Exit"
-;~     local $cmd1 = "<shellOpen>"&$FPQUI_HELPPATH&"</shellOpen>"
-;~     local $cmd2 = "taskkill /PID @AutoItPID /F"
-;~     local $btn = ""
-;~     $btn &= "<ID1><label>"&$btn1&"</label><cmd>"&$cmd1&"</cmd></ID1>"
-;~     $btn &= "<ID2><label>"&$btn2&"</label><cmd>"&$cmd2&"</cmd></ID2>"
-;~     local $msg = "<text>FP-QUI is running in the background. Notifications will be shown here.</text>"
-;~     $msg &= "<bkColor>0xBC8BDA</bkColor><ico>@ScriptDir\icon.ico</ico><noDouble>1</noDouble><delay>7000</delay>"
-;~     $msg &= "<untilClick><any>1</any><includeButton>1</includeButton></untilClick>"
-;~     $msg &= "<button>"&$btn&"</button>"
-
 	If $inhibitInternal==0 Then
 		_processRequest($code)
 	Else
