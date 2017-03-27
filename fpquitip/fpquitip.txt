@@ -1,0 +1,75 @@
+fpquitip Copyright(c) Alexey Kuryakin, 2017 <kouriakine@mail.ru>.
+fpquitip - program to show tooltip notifications via FP-QUI.
+Data to show may come from stdin or may be specified as parameter.
+FP-QUI is nice tooltip notification system made by Florian Pollak.
+FP-QUI Copyright(c) 2010-2017 Florian Pollak (bfourdev@gmail.com).
+Usage: 
+ fpquitip [-o [p]] [d]
+ -o - option identifier
+ p  - option parameter
+ d  - data to send
+Options:
+ -h, --help     - show help screen
+ -v, --verbose  - set verbose mode   (default OFF)
+ -c, --class c  - set window class c (default AutoIt v3 GUI)
+ -t, --title t  - set window title t (default FP-QUI/dispatcherWindow)
+ -e, --exe   f  - set exe filename f (default FP-QUICore.exe)
+ -m, --magic n  - set magic number n (default $21495551)
+ -d, --data  d  - set data to send d (specified in XML format)
+ -l, --log   l  - set log filename l (default OFF)
+Data [d] specify message to send. 
+That is list of pairs NAME VALUE which both must be non-empty.
+ NAME           VALUE           - Comment
+ preset         xxx             - Preset predefined parameters named `xxx`, see below:
+                xxx             - stdOk,stdNo,stdHelp,stdStop,stdDeny,stdAbort,stdError,stdFails,stdSiren,
+                                - stdAlarm,stdAlert,stdBreak,stdCancel,stdNotify,stdTooltip,stdSuccess,
+                                - stdWarning,stdQuestion,stdException,stdAttention,stdInformation,
+                                - stdExclamation
+                                - NB: preset xxx should be first in the list of parameters
+ verbose        1               - Verbose mode  (default = 0 is silent execution)
+ noDouble       1               - noDouble mode (default = 0 is enable double text)
+ text           "Hello world"   - Text to display
+ delay          15000           - Close after specified time ms (default 86400000 ms = day)
+ audio          notify.wav      - Play sound (*.wav file)
+ wav            notify.wav      - Synonym of audio
+ ico            notify.ico      - Show icon file (*.ico,*.exe,*.dll)
+ avi            alert.avi       - Show avi 32x32 icon file (*.avi)
+ bkColor        red             - Background color (default violet) 
+ textColor      0xFF0000        - Text color (default black)
+                                - Colors: black,white,red,green,blue,purple,orange,violet
+                                -  or Hex RGB as  0xRRGGBB, for example violet=0xBC8BDA
+ trans          255             - Transparency 0..255 (default 255)
+ font           "PT Mono"       - Font family name (default Tahoma)
+ fontSize       16              - Font size, pt (default 16)
+ onClick        "cmd arg"       - On click run command "cmd arg"
+ cmd0           "cmd arg"       - Symonym of onClick
+ untilClickAny  1               - Close on any click (default 1)
+ btn1..btn9     "Button label"  - Button 1..9 label text
+ cmd1..cmd9     "cmd arg"       - Button 1..9 command
+ guid           "{..}"          - Assign target window GUID which uses
+                                - to refresh updateable windows content
+ sure           0/1             - Synonym of createIfNotVisible flag
+                                - Uses to be sure that GUID window appears
+ createIfNotVisible 0/1         - 0/1=not/create window if one not visible
+                                - Uses only with guid option; default=1
+ delete         "{..guid..}"    - delete message window with given GUID
+ progress       p               - Show progress bar, p=0..100 percent
+                                - Uses with GUID to update progress
+ run            "cmd arg"       - Run command on message received
+                                - Command runs only if window visible
+ xml            "<x>..</x>"     - Append xml expression to message
+Exit codes:
+ 0 - data sent successfully
+ 1 - target window not found
+ 2 - unexpected exe filename
+ 3 - nothing to send, i.e. empty data
+ 4 - send operation failed or refused
+ 5 - invalid parameters was specified
+ 6 - general fault
+Examples:
+ 1) Help: fpquitip --help 
+ 2) Args: fpquitip -d "<text>Hello world.</text>"
+ 3) Pipe: cmd /c echo xml "<text>Hello world.</text>" | fpquitip
+ 4) Logs: fpquitip -v -l %temp%\fpquitip.log xml "<text>Hello world.</text>"
+ 5) Data: fpquitip text "Hello world." preset stdTooltip delay 15000
+

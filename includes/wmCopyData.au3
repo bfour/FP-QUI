@@ -7,16 +7,15 @@
 
 #ce
 
-#include-once
-#include <WindowsConstants.au3>
-
-;~ global const $WM_COPYDATA = 0x004A     ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms649011(v=vs.85).aspx
+;global const $WM_COPYDATA = 0x004A     ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms649011(v=vs.85).aspx
 global const $fpQuiMagic  = 0x21495551  ; = dump of 'QUI!' as integer - uses as message idetifier in COPYDATASTRUCT.dwData
 
 global const $wmCopyDataFifoSize  = 256                                 ; FIFO size
 global       $wmCopyDataFifoCount = 0                                   ; FIFO count
 global       $wmCopyDataFifoHead  = 0                                   ; FIFO head
 global       $wmCopyDataFifoBuff[$wmCopyDataFifoSize]                   ; FIFO buffer
+
+Global       $_WMCOPYDATA_IS_INITIALIZED = False
 
 func wmCopyDataFifoInit()                                               ; Initialize FIFO
     $wmCopyDataFifoCount = 0                                            ; Clear Counter
@@ -63,10 +62,12 @@ func HANDLE_WM_COPYDATA($hWnd, $msgID, $wParam, $lParam)                ; Handle
     return 0                                                            ; Notify sender - data not handled
 endfunc                                                                 ; Done HANDLE_WM_COPYDATA
 
-func wmCopyDataInit()                                                   ; Initialize WM_COPYDATA handling
-    GUIRegisterMsg($WM_COPYDATA, 'HANDLE_WM_COPYDATA')                  ; Register message handler
-    wmCopyDataFifoInit()                                                ; Initialize messages FIFO
-endfunc                                                                 ; Done wmCopyDataInit
+func wmCopyDataInit()                                                  ; Initialize WM_COPYDATA handling
+   If $_WMCOPYDATA_IS_INITIALIZED Then Return
+   GUIRegisterMsg($WM_COPYDATA, 'HANDLE_WM_COPYDATA')                  ; Register message handler
+   wmCopyDataFifoInit()                                                ; Initialize messages FIFO
+   $_WMCOPYDATA_IS_INITIALIZED = True
+endfunc                                                                ; Done wmCopyDataInit
 
 func wmCopyDataSend($hWnd, $sData)                                      ; Send WM_COPYDATA message
     local $dwData = $fpQuiMagic                                         ; Data identifier
@@ -79,10 +80,10 @@ func wmCopyDataSend($hWnd, $sData)                                      ; Send W
     DllStructSetData($tCOPYDATA, 2, $cbData)                            ; Set data size
     DllStructSetData($tCOPYDATA, 3, $lpData)                            ; Set data pointer
     local $pCOPYDATA = DllStructGetPtr($tCOPYDATA)                      ; COPYDATASTRUCT pointer
-    $Ret = DllCall('user32.dll', 'lparam', 'SendMessage', _             ; SendMessage API call
-                   'hwnd', $hWnd, _                                     ; Target window handle
-                   'int',  $WM_COPYDATA, _                              ; Message ID
-                   'wparam', 0, _                                       ; wparam should be source window handle
+    $Ret = DllCall('user32.dll', 'lparam', 'SendMessage',               ; SendMessage API call
+                   'hwnd', $hWnd,                                       ; Target window handle
+                   'int',  $WM_COPYDATA,                                ; Message ID
+                   'wparam', 0,                                         ; wparam should be source window handle
                    'lparam', $pCOPYDATA)                                ; lparam should be COPYDATASTRUCT pointer
     if (@error) or ($Ret[0] = -1) then                                  ; Check result
         return 0                                                        ; Notify error

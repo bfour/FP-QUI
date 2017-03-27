@@ -219,6 +219,14 @@ begin
  Result:='';
 end;
 
+ // Check directory exists
+function DirectoryExists(const Name:AnsiString):Boolean;
+var Code:Integer;
+begin
+ Code:=GetFileAttributes(PChar(Name));
+ Result:=(Code<>-1) and (FILE_ATTRIBUTE_DIRECTORY and Code <> 0);
+end;
+
  // Read a string from registry
 function ReadReqistryString(RootKey:DWORD; const Path,Name:AnsiString):AnsiString;
 var key:HKEY; DataType,BufSize:DWORD; Buffer:array[0..MAX_PATH-1] of char;
@@ -335,6 +343,36 @@ begin
  end;
 end;
 
+function SHGetSpecialFolderPath(hwndOwner:HWND; lpszPath:PChar;  nFolder:Integer; fCreate:BOOL):BOOL; stdcall;
+external 'shell32.dll' name 'SHGetSpecialFolderPathA';
+ 
+ // Get shecial folder path by CSIDL
+function GetSpecialShellFolderPath(CSIDL:Word):AnsiString;
+var Buff:array[0..MAX_PATH] of Char;
+begin
+ if SHGetSpecialFolderPath(0,Buff,CSIDL,True) then Result:=Buff else Result:='';
+end;
+
+ // Get temporary directory
+function GetTempDir:AnsiString;
+var Buff:array[0..MAX_PATH] of Char;
+begin
+ SetString(Result,Buff,GetTempPath(SizeOf(Buff),Buff));
+end;
+
+ // Return shared work directory - Common Documents or (as fallback) Common Application Data or TEMP
+function GetSharedWorkDir:AnsiString;
+const CSIDL_COMMON_DOCUMENTS=46; CSIDL_COMMON_APPDATA=35; // shlobj.h
+begin
+ Result:='';
+ if (Length(Result)=0) or not DirectoryExists(Result) then Result:=GetSpecialShellFolderPath(CSIDL_COMMON_DOCUMENTS);
+ if (Length(Result)=0) or not DirectoryExists(Result) then Result:=GetSpecialShellFolderPath(CSIDL_COMMON_APPDATA);
+ if (Length(Result)=0) or not DirectoryExists(Result) then Result:=GetEnv('TEMP');
+ if (Length(Result)=0) or not DirectoryExists(Result) then Result:=GetTempDir;
+ Result:=TrimSpacesQuotes(Result);
+ if Length(Result)>0 then if Result[Length(Result)] in ['\','/'] then Result:=Copy(Result,1,Length(Result)-1);
+end;
+
  // Send WM_COPYDATA message to window and return result from target handler
 function wmCopyDataSend(hWin:HWND; Data:PChar; Size:Cardinal; aMagic:Cardinal):LRESULT;
 var DataRec:TCopyDataStruct;
@@ -441,9 +479,9 @@ function FindFpQuiFile(dir,exe,fallbackexe:AnsiString):AnsiString;           // 
 var path:AnsiString;                                                         // or from usual locations
  procedure AttachDir(var path:AnsiString; dir,subdir:AnsiString);            // Attach dir\subdir to search path
  begin                                                                       // 
-  if (Length(dir)>0) and FileExists(dir) then begin                          // If dir directory exists
+  if (Length(dir)>0) and DirectoryExists(dir) then begin                     // If dir directory exists
    if Length(subdir)>0 then dir:=AttachTailChar(dir,'\')+subdir;             // and dir\subdir exists
-   if FileExists(dir) then path:=AttachTailChar(path,';')+ExpandFileName(dir); // then attach to path
+   if DirectoryExists(dir) then path:=AttachTailChar(path,';')+ExpandFileName(dir); // then attach to path
   end;                                                                       // 
   path:=AttachTailChar(path,';')                                             // 
  end;                                                                        // 
@@ -474,13 +512,14 @@ begin                                                                        //
 end;                                                                         //
 
 function RunFpQuiExe(WaitTimeOut:DWORD=INFINITE):DWORD;                      // Run FP-QUI.exe and wait initialization
-var exe:AnsiString; si:STARTUPINFO; pi:PROCESS_INFORMATION; tick:DWORD;      // 
+var exe,dir:AnsiString; si:STARTUPINFO; pi:PROCESS_INFORMATION; tick:DWORD;  // 
 begin                                                                        // 
  Result:=0; exe:=GetFpQuiCoreExe;                                            // Read exe filename from registry
  if (Length(exe)>0) and FileExists(exe) then begin                           // If one exist
   ZeroMemory(@si,sizeof(si)); si.cb:=sizeof(si);                             // Prepare startup info record
   si.dwFlags:=STARTF_USESHOWWINDOW; si.wShowWindow:=SW_SHOW;                 // Set show mode
-  if CreateProcess(PChar(exe),nil,nil,nil,FALSE,0,nil,nil,si,pi) then begin  // Create process
+  dir:=GetSharedWorkDir;                                                     //
+  if CreateProcess(PChar(exe),nil,nil,nil,FALSE,0,nil,PChar(dir),si,pi) then begin  // Create process
    Result:=pi.dwProcessId; WaitForInputIdle(pi.hProcess,WaitTimeOut);        // Wait some time while FP-QUI initialize
    tick:=GetTickCount;                                                       // 
    while (GetTickCount-tick<WaitTimeOut)                                     // Wait until  timeout
