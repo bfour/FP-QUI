@@ -1,5 +1,5 @@
 /screenshots/
-*.exe
+/*.exe
 /QUICode.xml
 /installer.SED
 /test.au3
