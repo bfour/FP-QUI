@@ -7,6 +7,8 @@
 
 #ce
 
+#include-once
+
 ;global const $WM_COPYDATA = 0x004A     ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms649011(v=vs.85).aspx
 global const $fpQuiMagic  = 0x21495551  ; = dump of 'QUI!' as integer - uses as message idetifier in COPYDATASTRUCT.dwData
 
