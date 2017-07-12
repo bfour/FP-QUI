@@ -1,4 +1,4 @@
-[![download_button](https://bfourdev.files.wordpress.com/2017/01/download_button2.png)](https://github.com/bfour/QUI/raw/master/dist/FP-QUI_v20170223T2319.zip)
+[![download_button](https://bfourdev.files.wordpress.com/2017/01/download_button2.png)](https://github.com/bfour/FP-QUI/raw/master/dist/FP-QUI_v20170327T1755.zip)
 
 QUI is a notification tool for Windows. It is highly customizable and can be invoked via command-line, thus allowing for an easy integration with existing programmes, eg. Thunderbird, without any need for specific add-ins. Have a look at a few screenshots:
 
