@@ -420,7 +420,7 @@ EndFunc
 Func _processRequest($requestString)
 
    _debug("process request: "&$requestString)
-
+   $requestString = StringRegExpReplace($requestString, "\r\n|\r|\n", " ")
    Local $options=_commandLineInterpreter($requestString,$cmdLineDescriptorRequest)
    _debug("process request: options parse end")
 
