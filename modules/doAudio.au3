@@ -52,25 +52,24 @@ Func _doAudio($i)
 
          Local $fileExtension = _pathGetFileExtension($path)
 
-         If $fileExtension=="wav" Or $fileExtension=="mp3" Then
+         If $fileExtension<>"wav" And $fileExtension<>"mp3" Then
+            _error('failed to play sound: file type is not wav or mp3', $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
+            Return(SetError(1, 0, ""))
+         EndIf
 
-            If $IDAvailable <> 1 Or $oldPath <> $path Then
-               _SoundClose($soundID)
-               $soundID = _SoundOpen($path) ; open sound and assing winhandle as alias
-               If @error Then
-                  _error('failed to open sound: @error='&@error&'; @extended='&@extended, $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
-                  Return(SetError(@error, @extended, ""))
-               EndIf
-            EndIf
-
-            _SoundPlay($soundID, 0)
+         If $IDAvailable <> 1 Or $oldPath <> $path Then
+            _SoundClose($soundID)
+            $soundID = _SoundOpen($path) ; open sound and assing winhandle as alias
             If @error Then
-               _error('failed to play sound: @error='&@error&'; @extended='&@extended, $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
+               _error('failed to open sound: @error='&@error&'; @extended='&@extended, $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
                Return(SetError(@error, @extended, ""))
             EndIf
+         EndIf
 
-         Else
-            ShellExecute($path,"","","open")
+         _SoundPlay($soundID, 0)
+         If @error Then
+            _error('failed to play sound: @error='&@error&'; @extended='&@extended, $errorInteractive, $errorBroadcast, $errorLog, $errorLogDir, $errorLogfile, $errorLogMaxNumberOfLines)
+            Return(SetError(@error, @extended, ""))
          EndIf
 
          ; shake
