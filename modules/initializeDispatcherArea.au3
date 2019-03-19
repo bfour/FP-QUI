@@ -23,6 +23,8 @@
 
 Func _initializeDispatcherArea()
 
+   Opt("WinWaitDelay", 0)
+
    Global $dispatcherWindowTitle  = _iniRead($globalConfigPath,"dispatcherWindow","title","FP-QUI/dispatcherWindow")
    Global $dispatcherArea         = _getDispatcherArea()
    Global $lastDispatcherArea     = $dispatcherArea
