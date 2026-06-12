@@ -15,7 +15,8 @@ This is the initial scaffold and core notification pipeline:
 - ✅ System tray icon with a menu (Settings, Generate Code, Send Test
   Notification, Quit)
 - ✅ Frameless, transparent, always-on-top notification popups, stacked in a
-  configurable corner of the screen
+  configurable corner of a configurable screen (work area, i.e. excluding
+  the taskbar)
 - ✅ Notification queue/positioning (reflow when a notification closes)
 - ✅ Settings window (corner, duration, colors, sound/TTS toggles, layout,
   autostart)
@@ -57,7 +58,10 @@ tauri-app/
   running in the tray).
 - `notif-<uuid>` — one per visible notification. Frameless, transparent,
   always-on-top, positioned by `notification.rs` according to the configured
-  corner and stacking order.
+  screen, corner and stacking order. Positioning uses each monitor's work
+  area (`Monitor::work_area()`), so notifications don't overlap the taskbar,
+  and accounts for the monitor's scale factor since window
+  position/size are in logical pixels while monitor geometry is physical.
 
 ### Notification spec (JSON)
 

@@ -4,7 +4,7 @@ mod legacy;
 mod notification;
 
 use config::AppConfig;
-use notification::{NotificationSpec, NotificationState};
+use notification::{MonitorInfo, NotificationSpec, NotificationState};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Emitter, Manager};
@@ -51,6 +51,11 @@ fn set_autostart(app: AppHandle, enabled: bool) -> Result<(), String> {
 #[tauri::command]
 fn get_autostart(app: AppHandle) -> Result<bool, String> {
     app.autolaunch().is_enabled().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn list_monitors(app: AppHandle) -> Vec<MonitorInfo> {
+    notification::list_monitors(&app)
 }
 
 /// Runs a notification button's command. Replaces executeCommand.au3 / doRun.au3.
@@ -120,6 +125,7 @@ pub fn run() {
             set_config,
             set_autostart,
             get_autostart,
+            list_monitors,
             run_command,
         ])
         .setup(|app| {

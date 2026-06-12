@@ -3,10 +3,20 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, LogicalPosition, Manager, Monitor, WebviewUrl, WebviewWindowBuilder};
 use uuid::Uuid;
 
 use crate::config::{self, Corner};
+
+/// A monitor as presented to the frontend for the "screen" setting.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MonitorInfo {
+    pub name: String,
+    pub width: u32,
+    pub height: u32,
+    pub primary: bool,
+}
 
 /// A clickable action shown on a notification.
 /// Mirrors the `<button><IDn><label>...</label><cmd>...</cmd></IDn></button>` tags
@@ -99,7 +109,7 @@ pub fn show(app: &AppHandle, mut spec: NotificationSpec) -> tauri::Result<String
     WebviewWindowBuilder::new(app, &label, WebviewUrl::App("index.html".into()))
         .title("FP-QUI Notification")
         .inner_size(width as f64, height as f64)
-        .position(x as f64, y as f64)
+        .position(x, y)
         .decorations(false)
         .transparent(true)
         .always_on_top(true)
@@ -151,52 +161,105 @@ pub fn reposition_all(app: &AppHandle) -> tauri::Result<()> {
         if let Some(window) = app.get_webview_window(&window_label(id)) {
             let corner_override = specs.get(id).and_then(|spec| spec.corner);
             let (x, y) = compute_position(app, &config, corner_override, index);
-            let _ = window.set_position(PhysicalPosition::new(x, y));
+            let _ = window.set_position(LogicalPosition::new(x, y));
         }
     }
 
     Ok(())
 }
 
-/// Computes the top-left position for the notification at the given stack
-/// index, anchored to the configured corner of the primary monitor.
-/// This is the Rust equivalent of _getOptimalPos() in positioning.au3.
+/// Computes the top-left position (in logical pixels, matching
+/// `WebviewWindowBuilder::position`/`inner_size`) for the notification at the
+/// given stack index, anchored to the configured corner of the configured
+/// monitor's work area (i.e. excluding the taskbar). This is the Rust
+/// equivalent of _getOptimalPos() / $dispatcherArea in positioning.au3.
 fn compute_position(
     app: &AppHandle,
     config: &config::AppConfig,
     corner_override: Option<Corner>,
     index: usize,
-) -> (i32, i32) {
-    let (screen_w, screen_h) = primary_monitor_size(app);
+) -> (f64, f64) {
+    let monitor = target_monitor(app, config);
 
-    let width = config.notification_width as i32;
-    let height = config.notification_height as i32;
-    let stack_offset = index as i32 * (height + config.gap);
+    // Monitor geometry is reported in physical pixels; window position/size
+    // are set in logical pixels, so convert using the monitor's scale factor.
+    let (origin_x, origin_y, area_w, area_h) = match &monitor {
+        Some(monitor) => {
+            let scale = monitor.scale_factor();
+            let work_area = monitor.work_area();
+            (
+                work_area.position.x as f64 / scale,
+                work_area.position.y as f64 / scale,
+                work_area.size.width as f64 / scale,
+                work_area.size.height as f64 / scale,
+            )
+        }
+        None => (0.0, 0.0, 1920.0, 1080.0),
+    };
+
+    let width = config.notification_width as f64;
+    let height = config.notification_height as f64;
+    let margin_x = config.margin_x as f64;
+    let margin_y = config.margin_y as f64;
+    let stack_offset = index as f64 * (height + config.gap as f64);
     let corner = corner_override.unwrap_or(config.corner);
 
     match corner {
-        Corner::TopLeft => (config.margin_x, config.margin_y + stack_offset),
+        Corner::TopLeft => (origin_x + margin_x, origin_y + margin_y + stack_offset),
         Corner::TopRight => (
-            screen_w - width - config.margin_x,
-            config.margin_y + stack_offset,
+            origin_x + area_w - width - margin_x,
+            origin_y + margin_y + stack_offset,
         ),
         Corner::BottomLeft => (
-            config.margin_x,
-            screen_h - height - config.margin_y - stack_offset,
+            origin_x + margin_x,
+            origin_y + area_h - height - margin_y - stack_offset,
         ),
         Corner::BottomRight => (
-            screen_w - width - config.margin_x,
-            screen_h - height - config.margin_y - stack_offset,
+            origin_x + area_w - width - margin_x,
+            origin_y + area_h - height - margin_y - stack_offset,
         ),
     }
 }
 
-fn primary_monitor_size(app: &AppHandle) -> (i32, i32) {
-    app.get_webview_window("main")
-        .and_then(|w| w.primary_monitor().ok().flatten())
-        .map(|monitor| {
-            let size: &PhysicalSize<u32> = monitor.size();
-            (size.width as i32, size.height as i32)
+/// Resolves the monitor that notifications should be shown on, based on
+/// `config.screen` (an index into `available_monitors()`, falling back to
+/// the primary monitor if unset or out of range).
+fn target_monitor(app: &AppHandle, config: &config::AppConfig) -> Option<Monitor> {
+    let window = app.get_webview_window("main")?;
+    let monitors = window.available_monitors().unwrap_or_default();
+
+    if let Some(index) = config.screen {
+        if let Some(monitor) = monitors.get(index) {
+            return Some(monitor.clone());
+        }
+    }
+
+    window
+        .primary_monitor()
+        .ok()
+        .flatten()
+        .or_else(|| monitors.into_iter().next())
+}
+
+/// Lists the available monitors, for the "screen" setting in the UI.
+pub fn list_monitors(app: &AppHandle) -> Vec<MonitorInfo> {
+    let Some(window) = app.get_webview_window("main") else {
+        return Vec::new();
+    };
+    let monitors = window.available_monitors().unwrap_or_default();
+    let primary_name = window.primary_monitor().ok().flatten().and_then(|m| m.name().cloned());
+
+    monitors
+        .iter()
+        .enumerate()
+        .map(|(i, monitor)| MonitorInfo {
+            name: monitor
+                .name()
+                .cloned()
+                .unwrap_or_else(|| format!("Screen {}", i + 1)),
+            width: monitor.size().width,
+            height: monitor.size().height,
+            primary: monitor.name() == primary_name.as_ref(),
         })
-        .unwrap_or((1920, 1080))
+        .collect()
 }

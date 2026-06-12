@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAutostart, getConfig, setAutostart, setConfig, showNotification } from "../lib/api";
-import type { AppConfig, Corner } from "../types";
+import { getAutostart, getConfig, listMonitors, setAutostart, setConfig, showNotification } from "../lib/api";
+import type { AppConfig, Corner, MonitorInfo } from "../types";
 import { CORNER_LABELS } from "../types";
 import "./Settings.css";
 
@@ -9,11 +9,13 @@ const CORNERS: Corner[] = ["top-left", "top-right", "bottom-left", "bottom-right
 export default function Settings() {
   const [config, setLocalConfig] = useState<AppConfig | null>(null);
   const [autostart, setLocalAutostart] = useState(false);
+  const [monitors, setMonitors] = useState<MonitorInfo[]>([]);
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
     getConfig().then(setLocalConfig);
     getAutostart().then(setLocalAutostart).catch(() => setLocalAutostart(false));
+    listMonitors().then(setMonitors).catch(() => setMonitors([]));
   }, []);
 
   if (!config) return <p className="settings__loading">Loading…</p>;
@@ -37,6 +39,22 @@ export default function Settings() {
   return (
     <div className="settings">
       <h2>Behaviour</h2>
+
+      <label className="settings__row">
+        <span>Screen</span>
+        <select
+          value={config.screen ?? ""}
+          onChange={(e) => update("screen", e.target.value === "" ? null : Number(e.target.value))}
+        >
+          <option value="">Primary</option>
+          {monitors.map((monitor, index) => (
+            <option key={index} value={index}>
+              {monitor.name} ({monitor.width}×{monitor.height}
+              {monitor.primary ? ", primary" : ""})
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="settings__row">
         <span>Screen corner</span>

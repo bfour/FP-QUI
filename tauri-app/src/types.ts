@@ -22,9 +22,19 @@ export interface NotificationSpec {
   corner?: Corner;
 }
 
+/** Mirrors MonitorInfo in src-tauri/src/notification.rs */
+export interface MonitorInfo {
+  name: string;
+  width: number;
+  height: number;
+  primary: boolean;
+}
+
 /** Mirrors AppConfig in src-tauri/src/config.rs */
 export interface AppConfig {
   corner: Corner;
+  /** Index into the array returned by `listMonitors`. `null`/`undefined` = primary monitor. */
+  screen?: number | null;
   defaultDurationMs: number;
   defaultBgColor: string;
   defaultTextColor: string;

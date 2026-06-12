@@ -21,6 +21,10 @@ pub enum Corner {
 #[serde(rename_all = "camelCase")]
 pub struct AppConfig {
     pub corner: Corner,
+    /// Index into the list returned by `list_monitors`, selecting which
+    /// screen notifications are shown on. `None` = primary monitor.
+    #[serde(default)]
+    pub screen: Option<usize>,
     /// Default time a notification stays visible, in milliseconds. 0 = until clicked.
     pub default_duration_ms: u32,
     pub default_bg_color: String,
@@ -38,6 +42,7 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             corner: Corner::BottomRight,
+            screen: None,
             default_duration_ms: 8000,
             default_bg_color: "#2b2b3a".into(),
             default_text_color: "#f5f5f5".into(),

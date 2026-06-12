@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { AppConfig, NotificationSpec } from "../types";
+import type { AppConfig, MonitorInfo, NotificationSpec } from "../types";
 
 export function showNotification(spec: Partial<NotificationSpec> & { text: string }) {
   const fullSpec: NotificationSpec = {
@@ -37,4 +37,8 @@ export function setAutostart(enabled: boolean) {
 
 export function runCommand(cmd: string) {
   return invoke<void>("run_command", { cmd });
+}
+
+export function listMonitors() {
+  return invoke<MonitorInfo[]>("list_monitors");
 }
