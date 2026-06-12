@@ -1,0 +1,93 @@
+html,
+body,
+#root {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.notification {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-family: system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  position: relative;
+  user-select: none;
+}
+
+.notification__close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.notification__close:hover {
+  opacity: 1;
+}
+
+.notification__body {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+}
+
+.notification__icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.notification__content {
+  min-width: 0;
+}
+
+.notification__title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.notification__text {
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.notification__buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.notification__button {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.notification__button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

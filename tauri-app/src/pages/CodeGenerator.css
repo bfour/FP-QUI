@@ -1,0 +1,62 @@
+.codegen {
+  padding: 16px 24px;
+  font-family: system-ui, sans-serif;
+  max-width: 640px;
+}
+
+.codegen__hint {
+  color: #888;
+  font-size: 13px;
+}
+
+.codegen h2 {
+  margin-top: 0;
+}
+
+.codegen h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+.codegen__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0;
+}
+
+.codegen__row input[type="checkbox"] {
+  align-self: flex-start;
+}
+
+.codegen__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+.codegen__button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.codegen__output {
+  background: #1e1e2a;
+  color: #d6e0ff;
+  padding: 10px 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+.codegen__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}

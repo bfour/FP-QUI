@@ -1,0 +1,54 @@
+.settings {
+  padding: 16px 24px;
+  font-family: system-ui, sans-serif;
+  max-width: 640px;
+}
+
+.settings h2 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+.settings__loading {
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+}
+
+.settings__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.settings__row span {
+  flex: 1;
+}
+
+.settings__row input[type="number"],
+.settings__row select {
+  width: 140px;
+}
+
+.settings__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+.settings__actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.settings__status {
+  color: #2a7;
+  font-size: 13px;
+}
