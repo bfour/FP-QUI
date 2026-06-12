@@ -22,3 +22,25 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ------------------------------------------------------------------------------
+# YARN 4 (BERRY) SPECIFIC
+# ------------------------------------------------------------------------------
+
+# --- CHOICE 1: Use this block if you ARE using Zero-Installs (Default / Recommended) ---
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# --- CHOICE 2: Uncomment this block (and comment Choice 1) if you are NOT using Zero-Installs ---
+# .pnp.*
+# .yarn/*
+# !.yarn/patches
+# !.yarn/plugins
+# !.yarn/releases
+# !.yarn/sdks
+# !.yarn/versions
