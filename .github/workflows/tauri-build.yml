@@ -2,7 +2,7 @@ name: Build Tauri app
 
 on:
   push:
-    branches: [main]
+    branches: [publish/production-tauri]
     paths:
       - "tauri-app/**"
       - ".github/workflows/tauri-build.yml"
