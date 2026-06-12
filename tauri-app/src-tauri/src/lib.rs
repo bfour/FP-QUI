@@ -11,12 +11,12 @@ use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_autostart::{ManagerExt, MacosLauncher};
 
 #[tauri::command]
-fn show_notification(app: AppHandle, spec: NotificationSpec) -> Result<String, String> {
+async fn show_notification(app: AppHandle, spec: NotificationSpec) -> Result<String, String> {
     notification::show(&app, spec).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn dismiss_notification(app: AppHandle, id: String) -> Result<(), String> {
+async fn dismiss_notification(app: AppHandle, id: String) -> Result<(), String> {
     notification::dismiss(&app, &id).map_err(|e| e.to_string())
 }
 
@@ -33,7 +33,7 @@ fn get_config(app: AppHandle) -> AppConfig {
 }
 
 #[tauri::command]
-fn set_config(app: AppHandle, config: AppConfig) -> Result<(), String> {
+async fn set_config(app: AppHandle, config: AppConfig) -> Result<(), String> {
     config::save(&app, &config).map_err(|e| e.to_string())?;
     notification::reposition_all(&app).map_err(|e| e.to_string())
 }
@@ -54,7 +54,7 @@ fn get_autostart(app: AppHandle) -> Result<bool, String> {
 }
 
 #[tauri::command]
-fn list_monitors(app: AppHandle) -> Vec<MonitorInfo> {
+async fn list_monitors(app: AppHandle) -> Vec<MonitorInfo> {
     notification::list_monitors(&app)
 }
 

@@ -62,6 +62,12 @@ tauri-app/
   area (`Monitor::work_area()`), so notifications don't overlap the taskbar,
   and accounts for the monitor's scale factor since window
   position/size are in logical pixels while monitor geometry is physical.
+  These windows are created on a dedicated background thread per
+  notification, never on the main/event-loop thread directly — on Windows,
+  building a `WebviewWindow` synchronously from a Tauri command or the
+  single-instance message handler deadlocks the whole app, since WebView2
+  initialization needs that thread's message loop to be free
+  (see [wry#583](https://github.com/tauri-apps/wry/issues/583)).
 
 ### Notification spec (JSON)
 

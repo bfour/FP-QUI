@@ -85,6 +85,13 @@ fn window_label(id: &str) -> String {
 }
 
 /// Creates and shows a new notification window, returning its id.
+///
+/// The actual window is built on a freshly spawned thread, not the calling
+/// thread: on Windows, `WebviewWindowBuilder::build()` deadlocks if called
+/// synchronously from the main/event-loop thread (e.g. from a Tauri command
+/// or the single-instance plugin's window-message handler), since WebView2
+/// initialization needs that thread's message loop to be free
+/// (see https://github.com/tauri-apps/wry/issues/583).
 pub fn show(app: &AppHandle, mut spec: NotificationSpec) -> tauri::Result<String> {
     if spec.id.is_empty() {
         spec.id = Uuid::new_v4().to_string();
@@ -105,32 +112,31 @@ pub fn show(app: &AppHandle, mut spec: NotificationSpec) -> tauri::Result<String
 
     let (x, y) = compute_position(app, &config, spec.corner, index);
     let (width, height) = (config.notification_width, config.notification_height);
+    let until_click = spec.until_click;
+    let delay = spec.delay_ms.unwrap_or(config.default_duration_ms);
 
-    WebviewWindowBuilder::new(app, &label, WebviewUrl::App("index.html".into()))
-        .title("FP-QUI Notification")
-        .inner_size(width as f64, height as f64)
-        .position(x, y)
-        .decorations(false)
-        .transparent(true)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .shadow(false)
-        .resizable(false)
-        .focused(false)
-        .visible(true)
-        .build()?;
+    let app_handle = app.clone();
+    let id_for_thread = id.clone();
+    std::thread::spawn(move || {
+        let window = WebviewWindowBuilder::new(&app_handle, &label, WebviewUrl::App("index.html".into()))
+            .title("FP-QUI Notification")
+            .inner_size(width as f64, height as f64)
+            .position(x, y)
+            .decorations(false)
+            .transparent(true)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .shadow(false)
+            .resizable(false)
+            .focused(false)
+            .visible(true)
+            .build();
 
-    if !spec.until_click {
-        let delay = spec.delay_ms.unwrap_or(config.default_duration_ms);
-        if delay > 0 {
-            let app_handle = app.clone();
-            let id_for_timeout = id.clone();
-            std::thread::spawn(move || {
-                std::thread::sleep(Duration::from_millis(delay as u64));
-                let _ = dismiss(&app_handle, &id_for_timeout);
-            });
+        if window.is_ok() && !until_click && delay > 0 {
+            std::thread::sleep(Duration::from_millis(delay as u64));
+            let _ = dismiss(&app_handle, &id_for_thread);
         }
-    }
+    });
 
     Ok(id)
 }
