@@ -119,9 +119,24 @@ substitutions are accepted but ignored.
 
 ## Development
 
-Requires Node.js, Rust, and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
-for your OS (on Linux: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`,
-`libayatana-appindicator3-dev`, `librsvg2-dev`).
+Requires Node.js and Rust, plus the platform-specific
+[Tauri prerequisites](https://v2.tauri.app/start/prerequisites/):
+
+- **Windows**: the MSVC C++ build tools (the Rust `x86_64-pc-windows-msvc`
+  target needs `link.exe`). Install
+  [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+  and, in the installer, select the **"Desktop development with C++"**
+  workload (this provides the MSVC linker + Windows SDK; plain VS Code is
+  *not* sufficient). Also install
+  [WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)
+  (preinstalled on Windows 11 / recent Windows 10).
+  - If you get `error: linker 'link.exe' not found` when running
+    `npm run tauri build`/`dev`, the C++ workload above is missing (or a
+    fresh shell/IDE restart is needed so `PATH` picks up the new tools).
+- **macOS**: Xcode Command Line Tools (`xcode-select --install`).
+- **Linux**: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`,
+  `libayatana-appindicator3-dev`, `librsvg2-dev` (and a C compiler/linker,
+  e.g. `build-essential`).
 
 ```sh
 npm install
