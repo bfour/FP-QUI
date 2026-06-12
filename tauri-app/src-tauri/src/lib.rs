@@ -1,5 +1,6 @@
 mod cli;
 mod config;
+mod legacy;
 mod notification;
 
 use config::AppConfig;

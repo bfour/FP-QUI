@@ -23,8 +23,8 @@ This is the initial scaffold and core notification pipeline:
   replacement for the old code-generator GUI
 - ✅ CLI-based IPC via Tauri's single-instance plugin (replaces the old
   named-pipe protocol used by `fpquisend`/`fpquitip`)
-- ⬜ Legacy `<text>...</text><bkColor>...</bkColor>` tag DSL compatibility
-  layer (new app uses JSON instead, see below)
+- ✅ Legacy `<text>...</text><bkColor>...</bkColor>` tag DSL compatibility
+  layer via `--notify-legacy` (new app uses JSON by default, see below)
 - ⬜ First-start wizard
 - ⬜ Bundled sound presets / icon presets
 - ⬜ Packaging & auto-update
@@ -46,7 +46,8 @@ tauri-app/
       lib.rs                # app setup, tray menu, commands, single-instance
       notification.rs        # NotificationSpec, window creation & stacking/positioning
       config.rs               # AppConfig, persisted via tauri-plugin-store
-      cli.rs                   # parses `--notify <json>` from argv
+      cli.rs                   # parses `--notify <json>` / `--notify-legacy <tags>` from argv
+      legacy.rs                # legacy `<text>...</text>` tag DSL -> NotificationSpec
 ```
 
 ### Windows
@@ -98,6 +99,24 @@ created. If it's not running, the argument is read from `std::env::args()`
 on first launch. No separate sender binary is needed — any process can just
 invoke the FP-QUI executable with `--notify`.
 
+#### Legacy tag-based syntax
+
+Existing integrations that still send the old FP-QUI tag notation (e.g.
+`<text>Hello</text><bkColor>purple</bkColor><delay>5000</delay>`) can use
+`--notify-legacy` instead of `--notify`:
+
+```sh
+fp-qui --notify-legacy '<text>Hello</text><bkColor>purple</bkColor><delay>5000</delay>'
+```
+
+This is parsed by `legacy.rs` (a Rust port of `_commandLineInterpreter.au3`'s
+nesting-aware tag parser) and mapped onto the same `NotificationSpec` used by
+`--notify`. Only the tags that map onto `NotificationSpec` are understood
+(`text`, `textColor`, `bkColor`, `ico`, `delay`, `untilClick`, `talk`,
+`audio`, `button`); layout/internal-only legacy tags (`width`, `height`, `x`,
+`y`, `font`, `dispatcherArea`, `GUID`, ...) and AutoIt macros/`%variable%`
+substitutions are accepted but ignored.
+
 ## Development
 
 Requires Node.js, Rust, and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
@@ -130,5 +149,5 @@ the Rust backend.
 | `_setAutoStart.au3` | `tauri-plugin-autostart` (`set_autostart`/`get_autostart` commands) |
 | `codeGeneratorGUI.au3`/`.kxf` | `pages/CodeGenerator.tsx` |
 | `configurationAssistantGUI.au3`, `firstStartGUI.au3` | `pages/Settings.tsx` (first-start wizard not yet ported) |
-| `argumentsPrompt.au3` | not yet ported (legacy DSL prompt; new app expects valid JSON) |
+| `argumentsPrompt.au3`, `_commandLineInterpreter.au3` | `legacy.rs` (`--notify-legacy <tags>`, see "Legacy tag-based syntax") |
 | `_log.au3`, `initializeErrorHandling.au3` | TODO — use `tracing` / `log` crate |
