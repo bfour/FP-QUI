@@ -19,7 +19,14 @@ jobs:
       matrix:
         include:
           - platform: windows-latest
-          - platform: macos-latest
+          # macos-latest is temporarily disabled: the build fails because
+          # WebviewWindowBuilder::transparent() is gated behind tauri's
+          # "macos-private-api" feature on macOS, which src-tauri/Cargo.toml
+          # does not enable. Re-enable this entry once that is resolved --
+          # either by turning on the feature (plus app.macOSPrivateApi in
+          # tauri.conf.json, which rules out Mac App Store distribution) or
+          # by dropping the transparent() call on macOS behind a #[cfg].
+          # - platform: macos-latest
           - platform: ubuntu-latest
 
     runs-on: ${{ matrix.platform }}
