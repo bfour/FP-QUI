@@ -6,10 +6,6 @@ on:
     paths:
       - "tauri-app/**"
       - ".github/workflows/tauri-build.yml"
-  pull_request:
-    paths:
-      - "tauri-app/**"
-      - ".github/workflows/tauri-build.yml"
   workflow_dispatch:
 
 jobs:
