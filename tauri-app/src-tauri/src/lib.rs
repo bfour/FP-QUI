@@ -2,9 +2,11 @@ mod cli;
 mod config;
 mod legacy;
 mod notification;
+mod theme;
 
 use config::AppConfig;
 use notification::{MonitorInfo, NotificationSpec, NotificationState};
+use theme::SystemTheme;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Emitter, Manager};
@@ -25,6 +27,13 @@ fn get_notification_spec(app: AppHandle, id: String) -> Option<NotificationSpec>
     let state = app.state::<NotificationState>();
     let specs = state.specs.lock().unwrap();
     specs.get(&id).cloned()
+}
+
+/// Reports the host OS notification look (rounded vs. square corners, dark vs.
+/// light theme) so notification windows can match it.
+#[tauri::command]
+fn get_system_theme(app: AppHandle) -> SystemTheme {
+    theme::current(&app)
 }
 
 #[tauri::command]
@@ -121,6 +130,7 @@ pub fn run() {
             show_notification,
             dismiss_notification,
             get_notification_spec,
+            get_system_theme,
             get_config,
             set_config,
             set_autostart,

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { AppConfig, MonitorInfo, NotificationSpec } from "../types";
+import type { AppConfig, MonitorInfo, NotificationSpec, SystemTheme } from "../types";
 
 export function showNotification(spec: Partial<NotificationSpec> & { text: string }) {
   const fullSpec: NotificationSpec = {
@@ -17,6 +17,10 @@ export function dismissNotification(id: string) {
 
 export function getNotificationSpec(id: string) {
   return invoke<NotificationSpec | null>("get_notification_spec", { id });
+}
+
+export function getSystemTheme() {
+  return invoke<SystemTheme>("get_system_theme");
 }
 
 export function getConfig() {

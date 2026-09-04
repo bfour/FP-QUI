@@ -82,9 +82,19 @@ export default function Settings() {
       </label>
 
       <label className="settings__row">
+        <span>Match the Windows light/dark theme</span>
+        <input
+          type="checkbox"
+          checked={config.useSystemTheme}
+          onChange={(e) => update("useSystemTheme", e.target.checked)}
+        />
+      </label>
+
+      <label className="settings__row">
         <span>Background color</span>
         <input
           type="color"
+          disabled={config.useSystemTheme}
           value={config.defaultBgColor}
           onChange={(e) => update("defaultBgColor", e.target.value)}
         />
@@ -94,6 +104,7 @@ export default function Settings() {
         <span>Text color</span>
         <input
           type="color"
+          disabled={config.useSystemTheme}
           value={config.defaultTextColor}
           onChange={(e) => update("defaultTextColor", e.target.value)}
         />

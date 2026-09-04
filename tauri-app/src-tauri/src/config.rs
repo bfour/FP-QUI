@@ -27,6 +27,12 @@ pub struct AppConfig {
     pub screen: Option<usize>,
     /// Default time a notification stays visible, in milliseconds. 0 = until clicked.
     pub default_duration_ms: u32,
+    /// When true, notifications take their colours from the Windows light/dark
+    /// theme instead of `default_bg_color`/`default_text_color`. A colour set on
+    /// an individual notification still wins over both. The corner style always
+    /// follows the shell, independently of this setting.
+    #[serde(default = "default_true")]
+    pub use_system_theme: bool,
     pub default_bg_color: String,
     pub default_text_color: String,
     pub sound_enabled: bool,
@@ -44,6 +50,7 @@ impl Default for AppConfig {
             corner: Corner::BottomRight,
             screen: None,
             default_duration_ms: 8000,
+            use_system_theme: true,
             default_bg_color: "#2b2b3a".into(),
             default_text_color: "#f5f5f5".into(),
             sound_enabled: true,
@@ -55,6 +62,10 @@ impl Default for AppConfig {
             gap: 10,
         }
     }
+}
+
+fn default_true() -> bool {
+    true
 }
 
 pub fn load(app: &AppHandle) -> AppConfig {
