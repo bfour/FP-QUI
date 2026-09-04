@@ -15,16 +15,16 @@ name = "tauri_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "=2.6.2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon"] }
-tauri-plugin-opener = "2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tauri-plugin-single-instance = "2.4.2"
-tauri-plugin-store = "2.4.3"
-tauri-plugin-autostart = "2.5.1"
-tauri-plugin-shell = "2.3.5"
-uuid = { version = "1.23.3", features = ["v4", "serde"] }
+tauri = { version = "=2.11.2", features = ["tray-icon"] }
+tauri-plugin-opener = "=2.5.4"
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.150"
+tauri-plugin-single-instance = "=2.4.2"
+tauri-plugin-store = "=2.4.3"
+tauri-plugin-autostart = "=2.5.1"
+tauri-plugin-shell = "=2.3.5"
+uuid = { version = "=1.23.3", features = ["v4", "serde"] }
 
