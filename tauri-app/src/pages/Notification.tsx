@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { dismissNotification, getConfig, getNotificationSpec, runCommand } from "../lib/api";
+import { useSystemTheme } from "../lib/systemTheme";
 import type { AppConfig, NotificationButton, NotificationSpec } from "../types";
 import "./Notification.css";
 
@@ -14,6 +15,7 @@ function notificationId(): string | null {
 export default function Notification() {
   const [spec, setSpec] = useState<NotificationSpec | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
+  const systemTheme = useSystemTheme();
   const id = notificationId();
 
   useEffect(() => {
@@ -49,13 +51,24 @@ export default function Notification() {
     close();
   };
 
-  const bg = spec.bkColor ?? config.defaultBgColor;
-  const fg = spec.textColor ?? config.defaultTextColor;
+  // Colours set on the notification itself always win. Otherwise we either
+  // follow the system light/dark theme (handled in CSS) or fall back to the
+  // configured default colours.
+  const fallbackBg = config.useSystemTheme ? undefined : config.defaultBgColor;
+  const fallbackFg = config.useSystemTheme ? undefined : config.defaultTextColor;
+  const bg = spec.bkColor ?? fallbackBg;
+  const fg = spec.textColor ?? fallbackFg;
 
   return (
     <div
       className="notification"
-      style={{ backgroundColor: bg, color: fg }}
+      data-theme={systemTheme.dark ? "dark" : "light"}
+      data-corners={systemTheme.rounded ? "rounded" : "square"}
+      style={{
+        borderRadius: `${systemTheme.cornerRadius}px`,
+        ...(bg ? { backgroundColor: bg } : {}),
+        ...(fg ? { color: fg } : {}),
+      }}
       onClick={() => {
         if (spec.untilClick || spec.buttons.length === 0) close();
       }}

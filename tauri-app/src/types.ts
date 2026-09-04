@@ -30,12 +30,24 @@ export interface MonitorInfo {
   primary: boolean;
 }
 
+/** Mirrors SystemTheme in src-tauri/src/theme.rs */
+export interface SystemTheme {
+  /** True when the shell draws rounded window corners (Windows 11 and later). */
+  rounded: boolean;
+  /** Corner radius in CSS pixels, matching the shell's own notifications. */
+  cornerRadius: number;
+  /** True when the user's apps are set to the dark system theme. */
+  dark: boolean;
+}
+
 /** Mirrors AppConfig in src-tauri/src/config.rs */
 export interface AppConfig {
   corner: Corner;
   /** Index into the array returned by `listMonitors`. `null`/`undefined` = primary monitor. */
   screen?: number | null;
   defaultDurationMs: number;
+  /** Take notification colors from the Windows light/dark theme instead of the defaults below. */
+  useSystemTheme: boolean;
   defaultBgColor: string;
   defaultTextColor: string;
   soundEnabled: boolean;

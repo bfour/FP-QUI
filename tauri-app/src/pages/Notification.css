@@ -9,20 +9,53 @@ body,
   overflow: hidden;
 }
 
+/*
+ * Colours follow the Windows light/dark theme; the shape follows the shell
+ * (Windows 11 rounds its toasts, Windows 10 and earlier draw them square).
+ * Both are set from JS as data-theme / data-corners on the
+ * card, and the corner radius itself comes from the backend as an inline style.
+ * An explicit colour on the notification or in the settings overrides the
+ * background/foreground tokens via an inline style as well.
+ */
 .notification {
+  /* Windows light theme toast surface. */
+  --notification-bg: #f9f9f9;
+  --notification-fg: #1b1b1b;
+  --notification-border: rgba(0, 0, 0, 0.1);
+  --notification-hover: rgba(0, 0, 0, 0.06);
+  --notification-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+
   box-sizing: border-box;
   width: 100%;
   height: 100%;
   padding: 12px 14px;
-  border-radius: 8px;
-  font-family: system-ui, sans-serif;
+  border: 1px solid var(--notification-border);
+  background-color: var(--notification-bg);
+  color: var(--notification-fg);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--notification-shadow);
   position: relative;
   user-select: none;
+}
+
+.notification[data-theme="dark"] {
+  /* Windows dark theme toast surface. */
+  --notification-bg: #2b2b2b;
+  --notification-fg: #ffffff;
+  --notification-border: rgba(255, 255, 255, 0.1);
+  --notification-hover: rgba(255, 255, 255, 0.1);
+  --notification-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* Windows 10 and earlier: square and flat, matching the toasts of that era.
+   The radius itself is set inline (0px) by the backend; only the softer,
+   less floaty shadow is left to do here. */
+.notification[data-corners="square"] {
+  --notification-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 .notification__close {
@@ -82,12 +115,22 @@ body,
   border: 1px solid currentColor;
   background: transparent;
   color: inherit;
-  border-radius: 4px;
   padding: 4px 10px;
+  font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
 
+/* Buttons pick up the shell's corner style too: pill-ish on Windows 11,
+   square on Windows 10. */
+.notification[data-corners="rounded"] .notification__button {
+  border-radius: 4px;
+}
+
+.notification[data-corners="square"] .notification__button {
+  border-radius: 0;
+}
+
 .notification__button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--notification-hover);
 }
