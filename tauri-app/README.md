@@ -10,10 +10,11 @@ AutoIt + Delphi.
 
 ## Status
 
-This is the initial scaffold and core notification pipeline:
+The core notification pipeline, the settings/code-generator UI and the
+packaging story are in place:
 
 - ✅ System tray icon with a menu (Settings, Generate Code, Send Test
-  Notification, Quit)
+  Notification, Check for Updates, Quit)
 - ✅ Frameless, transparent, always-on-top notification popups, stacked in a
   configurable corner of a configurable screen (work area, i.e. excluding
   the taskbar)
@@ -26,9 +27,13 @@ This is the initial scaffold and core notification pipeline:
   named-pipe protocol used by `fpquisend`/`fpquitip`)
 - ✅ Legacy `<text>...</text><bkColor>...</bkColor>` tag DSL compatibility
   layer via `--notify-legacy` (new app uses JSON by default, see below)
-- ⬜ First-start wizard
-- ⬜ Bundled sound presets / icon presets
-- ⬜ Packaging & auto-update
+- ✅ First-start assistant, shown once per configuration and re-runnable from
+  Settings
+- ✅ Bundled sound and icon presets, referenced as `preset:<id>`
+- ✅ Logging to a rotating file in the OS log directory (`tauri-plugin-log`)
+- ✅ Packaging & auto-update: signed installers built by the release workflow,
+  updates checked and installed from within the app (Windows and Linux;
+  macOS bundles are still switched off, see "Packaging and updates")
 
 ## Architecture
 
@@ -37,25 +42,30 @@ tauri-app/
   src/                     # React + TypeScript frontend
     types.ts               # NotificationSpec / AppConfig (mirrors Rust types)
     lib/api.ts              # typed wrappers around `invoke()`
-    App.tsx                  # picks a page based on the current window's label
+    lib/presets.ts           # bundled sound/icon presets, `preset:<id>` resolution
+    App.tsx                   # picks a page based on the current window's label
     pages/
-      Notification.tsx       # rendered in every "notif-<id>" window
-      Settings.tsx            # rendered in the "main" window
-      CodeGenerator.tsx        # rendered in the "main" window
+      Notification.tsx        # rendered in every "notif-<id>" window
+      Settings.tsx             # rendered in the "main" window
+      CodeGenerator.tsx         # rendered in the "main" window
+      FirstStart.tsx             # first-start assistant, rendered in the "main" window
+  public/presets/          # the bundled sounds and icons themselves
+  tools/                   # generator for the bundled sounds
   src-tauri/               # Rust backend
     src/
-      lib.rs                # app setup, tray menu, commands, single-instance
+      lib.rs                # app setup, tray menu, commands, single-instance, logging
       notification.rs        # NotificationSpec, window creation & stacking/positioning
-      config.rs               # AppConfig, persisted via tauri-plugin-store
+      config.rs               # AppConfig + first-run flag, persisted via tauri-plugin-store
       cli.rs                   # parses `--notify <json>` / `--notify-legacy <tags>` from argv
       legacy.rs                # legacy `<text>...</text>` tag DSL -> NotificationSpec
 ```
 
 ### Windows
 
-- `main` — hidden on startup, used for both the Settings and Generate Code
-  pages (tabs). Closing it hides it instead of quitting (the app keeps
-  running in the tray).
+- `main` — hidden on startup, used for the Settings, Generate Code and
+  first-start pages. Closing it hides it instead of quitting (the app keeps
+  running in the tray). On a configuration that has never been set up it is
+  shown on launch with the first-start assistant.
 - `notif-<uuid>` — one per visible notification. Frameless, transparent,
   always-on-top, positioned by `notification.rs` according to the configured
   screen, corner and stacking order. Positioning uses each monitor's work
@@ -86,11 +96,58 @@ Replaces the old tag-based "code" string
 }
 ```
 
-Fields: `title`, `text` (required), `textColor`, `bkColor`, `icon` (path or
-URL), `sound` (path or URL), `talk` (text to speak via TTS), `delayMs`
+Fields: `title`, `text` (required), `textColor`, `bkColor`, `icon`
+(`preset:<id>`, path or URL), `sound` (`preset:<id>`, path or URL), `talk`
+(text to speak via TTS), `delayMs`
 (0/omitted = use the configured default, omit + `untilClick: true` = stays
 open until dismissed), `untilClick`, `buttons[]` (`label` + `cmd` and/or
 `url`), `corner` (per-notification override of the configured screen corner).
+
+### First start
+
+The first time FP-QUI runs against a fresh configuration it opens the main
+window on a short assistant (`pages/FirstStart.tsx`) instead of going straight
+to the tray: autostart, screen/corner/duration, sound and speech, and an
+example command to copy. Finishing or skipping it sets a `firstRunCompleted`
+flag in the same store the configuration lives in, so it is shown once;
+Settings → Troubleshooting can bring it back. This replaces
+`firstStartGUI.au3`/`firstStartHandling.au3`, which shipped as a separate
+`FP-QUIFirstStartAssistant.exe`.
+
+Launching with `--notify` never opens the assistant — a notification request
+is not the moment to ask someone about autostart.
+
+### Presets
+
+`icon` and `sound` accept a `preset:<id>` reference to one of the assets
+bundled with the app, next to the paths and URLs they already took:
+
+| Sounds | Icons |
+| --- | --- |
+| `preset:chime`, `preset:ping`, `preset:alert`, `preset:success`, `preset:error` | `preset:info`, `preset:success`, `preset:warning`, `preset:error`, `preset:message`, `preset:bell` |
+
+```sh
+fp-qui --notify '{"text":"Build finished","icon":"preset:success","sound":"preset:chime"}'
+```
+
+References stay unresolved until a notification is rendered
+(`src/lib/presets.ts`), so a command generated on one machine works on another.
+The same code resolves the other two forms: URLs are passed through, and a
+plain file path is converted to Tauri's asset protocol — a bare path is not
+loadable from a webview otherwise, which is why `app.security.assetProtocol`
+is enabled in `tauri.conf.json`. Its scope is deliberately unrestricted: a
+notification may name any icon or sound on the machine, and the only pages
+loaded into these webviews are FP-QUI's own.
+
+The sounds live in `public/presets/sounds` and are generated by
+`tools/generate-sound-presets.py` (short synthesized tones, so nothing has to
+be shipped under someone else's license); the icons are hand-written SVGs in
+`public/presets/icons`. To add a preset, drop the file in and add an entry to
+`SOUND_PRESETS`/`ICON_PRESETS` in `src/lib/presets.ts`.
+
+Settings has a "default sound", played for notifications that don't bring
+their own (`preset:chime` out of the box, or "(silent)" for the old behaviour
+of staying quiet unless asked).
 
 ### Command-line / IPC
 
@@ -156,7 +213,70 @@ npm run tauri build  # produce a release bundle
 
 `npm run build` type-checks and builds the frontend only (no native
 dependencies required). `cargo check` / `cargo build` in `src-tauri/` build
-the Rust backend.
+the Rust backend. `python3 tools/generate-sound-presets.py` regenerates the
+bundled sounds.
+
+## Packaging and updates
+
+`.github/workflows/tauri-build.yml` builds the app on every push to
+`publish/production-tauri` and uploads the bundles as workflow artifacts —
+that is the "does it still build" job.
+
+Releases go through `.github/workflows/tauri-release.yml`, which runs on a
+`tauri-v*` tag (or on demand), builds the installers, signs the updater
+artifacts and attaches everything — including the `latest.json` the in-app
+updater reads — to a **draft** GitHub release. Nothing reaches users until
+that release is published.
+
+Signing keys are generated once with `pnpm tauri signer generate` and stored
+as repository secrets:
+
+| Secret | Contents |
+| --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | the generated private key |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | its password (`""` if none) |
+| `TAURI_SIGNING_PUBLIC_KEY` | the matching public key |
+
+The public key is written into a build-time config overlay
+(`src-tauri/tauri.release.conf.json`, generated by the workflow and
+gitignored) together with `bundle.createUpdaterArtifacts`, so the app only
+accepts updates signed with the private key while development builds need no
+keys at all — `plugins.updater.pubkey` in the committed `tauri.conf.json` is
+deliberately empty. A locally built app can therefore find an update but not
+install it; that is expected.
+
+Releasing a version:
+
+1. bump `version` in `src-tauri/tauri.conf.json` (and `package.json`),
+2. push a `tauri-v<version>` tag,
+3. review the draft release the workflow created and publish it.
+
+The app checks for updates on request — "Check for Updates" in the tray menu,
+or the Updates section in Settings — against
+`https://github.com/bfour/FP-QUI/releases/latest/download/latest.json`, and
+offers to download, install and restart. There is no automatic background
+check.
+
+macOS is not part of either workflow yet: notification windows are
+transparent, which on macOS needs tauri's `macos-private-api` feature (plus
+`app.macOSPrivateApi`), and turning that on rules out Mac App Store
+distribution. Enabling it — or dropping `transparent()` on macOS behind a
+`#[cfg]` — is what re-enables the macOS jobs.
+
+## Logging
+
+`tauri-plugin-log` writes to stdout (useful with `npm run tauri dev`) and to a
+rotating `fp-qui.log` in the OS log directory:
+
+| Platform | Location |
+| --- | --- |
+| Windows | `%LOCALAPPDATA%\dev.bfour.fpqui\logs` |
+| macOS | `~/Library/Logs/dev.bfour.fpqui` |
+| Linux | `~/.local/share/dev.bfour.fpqui/logs` |
+
+Settings → Troubleshooting → "Open log folder" opens it. Failures that used to
+disappear into `let _ = ...` (window creation, command execution, storing the
+configuration) are logged there.
 
 ## Migration mapping (old AutoIt modules -> new equivalent)
 
@@ -166,13 +286,17 @@ the Rust backend.
 | `splashNotification.au3` | `notification::show()` + `pages/Notification.tsx` |
 | `positioning.au3` | `notification::compute_position()` / `reposition_all()` |
 | `initializeNotificationsArrays.au3` | `NotificationState` in `notification.rs` |
-| `doAudio.au3`, `doBeep.au3` | `<audio>`/`Audio()` playback in `Notification.tsx` |
+| `doAudio.au3`, `doBeep.au3` | `<audio>`/`Audio()` playback in `Notification.tsx`, bundled presets in `lib/presets.ts` |
 | `doTalk.au3` | `window.speechSynthesis` in `Notification.tsx` |
 | `doRun.au3`, `executeCommand.au3`, `forwardRequest.au3` | `run_command` Tauri command (`tauri-plugin-shell`) |
 | `NamedPipes.au3`, `_pipe.au3`, `wmCopyData.au3`, `fpquisend`, `fpquitip` | `tauri-plugin-single-instance` + `--notify <json>` (`cli.rs`) |
 | `setConfiguration.au3`, `initializeDefaults.au3`, `initializeColors.au3`, `setBehaviour.au3` | `AppConfig` in `config.rs` + `pages/Settings.tsx` |
 | `_setAutoStart.au3` | `tauri-plugin-autostart` (`set_autostart`/`get_autostart` commands) |
 | `codeGeneratorGUI.au3`/`.kxf` | `pages/CodeGenerator.tsx` |
-| `configurationAssistantGUI.au3`, `firstStartGUI.au3` | `pages/Settings.tsx` (first-start wizard not yet ported) |
+| `configurationAssistantGUI.au3` | `pages/Settings.tsx` |
+| `firstStartGUI.au3`, `firstStartHandling.au3`, `FP-QUIFirstStartAssistant` | `pages/FirstStart.tsx` (see "First start") |
 | `argumentsPrompt.au3`, `_commandLineInterpreter.au3` | `legacy.rs` (`--notify-legacy <tags>`, see "Legacy tag-based syntax") |
-| `_log.au3`, `initializeErrorHandling.au3` | TODO — use `tracing` / `log` crate |
+| `_log.au3`, `initializeErrorHandling.au3` | `log` macros + `tauri-plugin-log` (see "Logging") |
+| `FP-QUIRegistrar.au3` (registry entry so other apps can find and start FP-QUI) | not needed — the installer puts the executable in a fixed location and callers run it directly |
+| `deploy.au3`, `deployBinary.au3`, `deploySource.au3`, `install-daqgroup-notifier.nsi` | Tauri bundler + `.github/workflows/tauri-release.yml` (see "Packaging and updates") |
+| (no equivalent — updates were manual) | `tauri-plugin-updater` + `tauri-plugin-process`, driven from the tray menu and Settings |

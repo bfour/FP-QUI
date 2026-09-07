@@ -1,0 +1,115 @@
+name: Release Tauri app
+
+# Builds the installers for a tagged version, signs the updater artifacts and
+# attaches everything (including the `latest.json` the in-app updater reads) to
+# a draft GitHub release. Publish that release to hand the update to everyone.
+#
+# Requires three repository secrets, generated once with
+# `pnpm tauri signer generate`:
+#   TAURI_SIGNING_PRIVATE_KEY           the generated private key
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  its password ("" if none was set)
+#   TAURI_SIGNING_PUBLIC_KEY            the matching public key
+# The public key is baked into the build so the app only accepts updates
+# signed with the private one; keep the private key out of the repository.
+
+on:
+  push:
+    tags: ["tauri-v*"]
+  workflow_dispatch:
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+          # macos-latest stays disabled for the same reason as in
+          # tauri-build.yml: transparent notification windows need tauri's
+          # "macos-private-api" feature, which has not been turned on.
+          # - platform: macos-latest
+          - platform: ubuntu-22.04
+
+    runs-on: ${{ matrix.platform }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check signing secrets
+        shell: bash
+        env:
+          PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+          PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$PUBLIC_KEY" ] || [ -z "$PRIVATE_KEY" ]; then
+            echo "::error::TAURI_SIGNING_PUBLIC_KEY and TAURI_SIGNING_PRIVATE_KEY must be set" \
+                 "as repository secrets (generate them with 'pnpm tauri signer generate')."
+            exit 1
+          fi
+
+      - name: Install Linux dependencies
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            build-essential \
+            curl \
+            wget \
+            file
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: tauri-app/src-tauri -> target
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: tauri-app/package.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: tauri-app/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: tauri-app
+        run: pnpm install --frozen-lockfile
+
+      # The committed config leaves plugins.updater.pubkey empty so development
+      # builds need no keys; the release build gets the real key (and the
+      # updater artifacts) from this overlay.
+      - name: Configure updater signing
+        shell: bash
+        env:
+          PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+        run: |
+          printf '{"bundle":{"createUpdaterArtifacts":true},"plugins":{"updater":{"pubkey":"%s"}}}\n' \
+            "$PUBLIC_KEY" > tauri-app/src-tauri/tauri.release.conf.json
+
+      - name: Build and draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: tauri-app
+          args: --config src-tauri/tauri.release.conf.json
+          tagName: tauri-v__VERSION__
+          releaseName: FP-QUI v__VERSION__
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true

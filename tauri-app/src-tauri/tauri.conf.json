@@ -15,23 +15,47 @@
         "label": "main",
         "title": "FP-QUI Settings",
         "width": 760,
-        "height": 560,
+        "height": 620,
         "visible": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/bfour/FP-QUI/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
     }
   },
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Florian Pollak",
+    "copyright": "Copyright © 2010-2026 Florian Pollak",
+    "category": "Utility",
+    "licenseFile": "../../license.txt",
+    "shortDescription": "Scriptable popup notifications",
+    "longDescription": "FP-QUI shows highly customizable popup notifications that other programs can trigger from the command line, and lives in the system tray while it waits for them.",
+    "homepage": "https://github.com/bfour/FP-QUI",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "both"
+      }
+    }
   }
 }

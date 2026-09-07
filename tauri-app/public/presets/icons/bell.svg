@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Bell">
+  <circle cx="32" cy="32" r="30" fill="#7b5bd6"/>
+  <path d="M32 12a10 10 0 0 1 10 10v9l4 7H18l4-7v-9a10 10 0 0 1 10-10z" fill="#ffffff"/>
+  <path d="M27 42a5 5 0 0 0 10 0z" fill="#ffffff"/>
+</svg>

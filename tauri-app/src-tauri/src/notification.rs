@@ -115,6 +115,15 @@ pub fn show(app: &AppHandle, mut spec: NotificationSpec) -> tauri::Result<String
     let until_click = spec.until_click;
     let delay = spec.delay_ms.unwrap_or(config.default_duration_ms);
 
+    log::info!(
+        "showing notification {id} at ({x}, {y}) for {}",
+        if until_click || delay == 0 {
+            "until it is clicked".to_string()
+        } else {
+            format!("{delay} ms")
+        }
+    );
+
     let app_handle = app.clone();
     let id_for_thread = id.clone();
     std::thread::spawn(move || {
@@ -132,9 +141,23 @@ pub fn show(app: &AppHandle, mut spec: NotificationSpec) -> tauri::Result<String
             .visible(true)
             .build();
 
-        if window.is_ok() && !until_click && delay > 0 {
-            std::thread::sleep(Duration::from_millis(delay as u64));
-            let _ = dismiss(&app_handle, &id_for_thread);
+        match window {
+            Ok(_) => {
+                if !until_click && delay > 0 {
+                    std::thread::sleep(Duration::from_millis(delay as u64));
+                    if let Err(error) = dismiss(&app_handle, &id_for_thread) {
+                        log::error!("could not dismiss notification {id_for_thread}: {error}");
+                    }
+                }
+            }
+            Err(error) => {
+                log::error!("could not create the window for notification {id_for_thread}: {error}");
+                // The notification never made it onto the screen, so drop it
+                // from the stack instead of leaving a gap in the layout.
+                if let Err(error) = dismiss(&app_handle, &id_for_thread) {
+                    log::error!("could not clean up notification {id_for_thread}: {error}");
+                }
+            }
         }
     });
 
@@ -167,7 +190,9 @@ pub fn reposition_all(app: &AppHandle) -> tauri::Result<()> {
         if let Some(window) = app.get_webview_window(&window_label(id)) {
             let corner_override = specs.get(id).and_then(|spec| spec.corner);
             let (x, y) = compute_position(app, &config, corner_override, index);
-            let _ = window.set_position(LogicalPosition::new(x, y));
+            if let Err(error) = window.set_position(LogicalPosition::new(x, y)) {
+                log::warn!("could not reposition notification {id}: {error}");
+            }
         }
     }
 

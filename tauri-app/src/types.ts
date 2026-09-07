@@ -51,6 +51,11 @@ export interface AppConfig {
   defaultBgColor: string;
   defaultTextColor: string;
   soundEnabled: boolean;
+  /**
+   * Sound for notifications that don't bring their own: a `preset:<id>`
+   * reference, a file path, a URL, or "" to stay silent.
+   */
+  defaultSound: string;
   ttsEnabled: boolean;
   marginX: number;
   marginY: number;

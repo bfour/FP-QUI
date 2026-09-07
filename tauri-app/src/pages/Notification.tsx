@@ -3,6 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { dismissNotification, getConfig, getNotificationSpec, runCommand } from "../lib/api";
 import { useSystemTheme } from "../lib/systemTheme";
+import { resolveIcon, resolveSound } from "../lib/presets";
 import type { AppConfig, NotificationButton, NotificationSpec } from "../types";
 import "./Notification.css";
 
@@ -27,8 +28,11 @@ export default function Notification() {
   useEffect(() => {
     if (!spec || !config) return;
 
-    if (spec.sound && config.soundEnabled) {
-      new Audio(spec.sound).play().catch(() => {
+    // A notification's own sound wins; otherwise the configured default
+    // (a bundled preset out of the box) is played.
+    const sound = config.soundEnabled ? resolveSound(spec.sound ?? config.defaultSound) : undefined;
+    if (sound) {
+      new Audio(sound).play().catch(() => {
         /* ignore playback errors, e.g. missing/blocked audio device */
       });
     }
@@ -58,6 +62,7 @@ export default function Notification() {
   const fallbackFg = config.useSystemTheme ? undefined : config.defaultTextColor;
   const bg = spec.bkColor ?? fallbackBg;
   const fg = spec.textColor ?? fallbackFg;
+  const icon = resolveIcon(spec.icon);
 
   return (
     <div
@@ -78,7 +83,7 @@ export default function Notification() {
       </button>
 
       <div className="notification__body">
-        {spec.icon && <img className="notification__icon" src={spec.icon} alt="" />}
+        {icon && <img className="notification__icon" src={icon} alt="" />}
         <div className="notification__content">
           {spec.title && <div className="notification__title">{spec.title}</div>}
           <div className="notification__text">{spec.text}</div>
