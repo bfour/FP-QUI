@@ -4,6 +4,9 @@ use tauri_plugin_store::StoreExt;
 
 const STORE_FILE: &str = "config.json";
 const CONFIG_KEY: &str = "config";
+/// Set once the first-start assistant has been completed or skipped, so it is
+/// only shown to a fresh configuration (see firstStartHandling.au3).
+const FIRST_RUN_KEY: &str = "firstRunCompleted";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -36,6 +39,11 @@ pub struct AppConfig {
     pub default_bg_color: String,
     pub default_text_color: String,
     pub sound_enabled: bool,
+    /// Sound played for notifications that don't bring their own. Either a
+    /// bundled preset (`preset:<id>`, see src/lib/presets.ts), a file path or
+    /// a URL. Empty = stay silent unless a notification asks for a sound.
+    #[serde(default = "default_sound")]
+    pub default_sound: String,
     pub tts_enabled: bool,
     pub margin_x: i32,
     pub margin_y: i32,
@@ -54,6 +62,7 @@ impl Default for AppConfig {
             default_bg_color: "#2b2b3a".into(),
             default_text_color: "#f5f5f5".into(),
             sound_enabled: true,
+            default_sound: default_sound(),
             tts_enabled: false,
             margin_x: 16,
             margin_y: 16,
@@ -66,6 +75,10 @@ impl Default for AppConfig {
 
 fn default_true() -> bool {
     true
+}
+
+fn default_sound() -> String {
+    "preset:chime".into()
 }
 
 pub fn load(app: &AppHandle) -> AppConfig {
@@ -83,6 +96,26 @@ pub fn load(app: &AppHandle) -> AppConfig {
 pub fn save(app: &AppHandle, config: &AppConfig) -> tauri_plugin_store::Result<()> {
     let store = app.store(STORE_FILE)?;
     store.set(CONFIG_KEY, serde_json::to_value(config).expect("AppConfig is serializable"));
+    store.save()?;
+    Ok(())
+}
+
+/// True until the first-start assistant has been completed or skipped once.
+/// A store that can't be opened counts as "not the first run", so a broken
+/// store doesn't put the assistant in the user's way on every launch.
+pub fn is_first_run(app: &AppHandle) -> bool {
+    match app.store(STORE_FILE) {
+        Ok(store) => !matches!(store.get(FIRST_RUN_KEY), Some(serde_json::Value::Bool(true))),
+        Err(error) => {
+            log::warn!("could not read the first-run flag: {error}");
+            false
+        }
+    }
+}
+
+pub fn set_first_run_completed(app: &AppHandle, completed: bool) -> tauri_plugin_store::Result<()> {
+    let store = app.store(STORE_FILE)?;
+    store.set(FIRST_RUN_KEY, serde_json::Value::Bool(completed));
     store.save()?;
     Ok(())
 }

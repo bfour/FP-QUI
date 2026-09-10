@@ -52,3 +52,25 @@
   color: #2a7;
   font-size: 13px;
 }
+
+.settings__inline-button {
+  margin-left: 8px;
+}
+
+.settings__note {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.settings__error {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #c33;
+}
+
+.settings__update {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

@@ -46,3 +46,15 @@ export function runCommand(cmd: string) {
 export function listMonitors() {
   return invoke<MonitorInfo[]>("list_monitors");
 }
+
+export function isFirstRun() {
+  return invoke<boolean>("is_first_run");
+}
+
+export function setFirstRunCompleted(completed: boolean) {
+  return invoke<void>("set_first_run_completed", { completed });
+}
+
+export function openLogDir() {
+  return invoke<void>("open_log_dir");
+}

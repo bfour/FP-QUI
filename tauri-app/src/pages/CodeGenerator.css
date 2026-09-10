@@ -29,7 +29,8 @@
   padding: 6px 0;
 }
 
-.codegen__row input[type="checkbox"] {
+.codegen__row input[type="checkbox"],
+.codegen__row button {
   align-self: flex-start;
 }
 
